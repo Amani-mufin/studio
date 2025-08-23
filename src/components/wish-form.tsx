@@ -67,10 +67,10 @@ const FONT_OPTIONS = [
 ];
 
 const DEFAULT_IMAGES = [
-  'https://asset.cloudinary.com/sirsuccess/2074ba736a35c360db8997a4d9bed277',
-  'https://asset.cloudinary.com/sirsuccess/64ca296c2634008ad0f107f963d04782',
-  'https://asset.cloudinary.com/sirsuccess/dc94b7912a264827d8145e06929d3ee4',
-  'https://i.imgur.com/xV6020q.png',
+  'https://placehold.co/600x400.png',
+  'https://placehold.co/600x400.png',
+  'https://placehold.co/600x400.png',
+  'https://placehold.co/600x400.png',
 ];
 
 export function WishForm({ cardData, onSave }: WishFormProps) {
