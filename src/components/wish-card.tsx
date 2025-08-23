@@ -18,6 +18,8 @@ import { WishForm } from './wish-form';
 import { getPoemAction } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import * as htmlToImage from 'html-to-image';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
 
 interface WishCardProps {
   card: WishCardData;
@@ -106,6 +108,7 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
   };
   
   return (
+    <TooltipProvider>
     <Card
       ref={cardRef}
       className="absolute w-[300px] min-h-[150px] shadow-lg transition-all duration-300 ease-in-out hover:shadow-primary/50 hover:scale-105 group"
@@ -120,15 +123,22 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
       <CardHeader>
         <CardTitle className="flex justify-between items-start">
           <span>{card.name}</span>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 cursor-grab group-hover:opacity-100 opacity-0 transition-opacity"
-            onMouseDown={handleDragStart}
-            aria-label="Drag card"
-          >
-            <GripVertical className="h-5 w-5" />
-          </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 cursor-grab group-hover:opacity-100 opacity-0 transition-opacity"
+                  onMouseDown={handleDragStart}
+                  aria-label="Drag card"
+                >
+                  <GripVertical className="h-5 w-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Drag</p>
+              </TooltipContent>
+            </Tooltip>
         </CardTitle>
         <CardDescription style={{ color: card.style.textColor, opacity: 0.8 }}>
           {format(new Date(card.createdAt), "PPP, p")}
@@ -149,29 +159,72 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
       </CardContent>
       <CardFooter className="flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <div className="flex gap-1 items-center">
-          <Button variant="ghost" size="icon" aria-label="Love" onClick={() => handleReaction('love')} className="flex items-center gap-1 px-2">
-            <Heart className="h-4 w-4" /> 
-            <span className="text-xs">{card.reactions.love || 0}</span>
-          </Button>
-          <Button variant="ghost" size="icon" aria-label="Celebrate" onClick={() => handleReaction('celebration')} className="flex items-center gap-1 px-2">
-            <PartyPopper className="h-4 w-4" />
-            <span className="text-xs">{card.reactions.celebration || 0}</span>
-          </Button>
-          <Button variant="ghost" size="icon" aria-label="Clap" onClick={() => handleReaction('clap')} className="flex items-center gap-1 px-2">
-            <Hand className="h-4 w-4" />
-            <span className="text-xs">{card.reactions.clap || 0}</span>
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="Love" onClick={() => handleReaction('love')} className="flex items-center gap-1 px-2">
+                <Heart className="h-4 w-4" /> 
+                <span className="text-xs">{card.reactions.love || 0}</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Love</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="Celebrate" onClick={() => handleReaction('celebration')} className="flex items-center gap-1 px-2">
+                <PartyPopper className="h-4 w-4" />
+                <span className="text-xs">{card.reactions.celebration || 0}</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Celebrate</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="Clap" onClick={() => handleReaction('clap')} className="flex items-center gap-1 px-2">
+                <Hand className="h-4 w-4" />
+                <span className="text-xs">{card.reactions.clap || 0}</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Clap</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
         <div className="flex gap-1">
-          <WishForm cardData={card} onSave={updateCard} />
-          <Button variant="ghost" size="icon" aria-label="Generate poem" onClick={generatePoem} disabled={isPending}>
-            {isPending ? <Loader className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-          </Button>
-          <Button variant="ghost" size="icon" aria-label="Download card" onClick={handleDownload}>
-            <Download className="h-4 w-4" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <WishForm cardData={card} onSave={updateCard} />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Edit</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="Generate poem" onClick={generatePoem} disabled={isPending}>
+                {isPending ? <Loader className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Generate Poem</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="Download card" onClick={handleDownload}>
+                <Download className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Download</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
       </CardFooter>
     </Card>
+    </TooltipProvider>
   );
 }

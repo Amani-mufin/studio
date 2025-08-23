@@ -7,10 +7,10 @@ const LOCAL_STORAGE_KEY = 'wish-weaver-board';
 
 export function useWishBoard() {
   const [cards, setCards] = useState<WishCardData[]>([]);
-  const [isMounted, setIsMounted] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
+    setIsClient(true);
     try {
       const storedCards = window.localStorage.getItem(LOCAL_STORAGE_KEY);
       if (storedCards) {
@@ -22,22 +22,24 @@ export function useWishBoard() {
   }, []);
 
   useEffect(() => {
-    if (isMounted) {
+    if (isClient) {
       try {
         window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cards));
       } catch (error) {
         console.error('Failed to save cards to local storage', error);
       }
     }
-  }, [cards, isMounted]);
+  }, [cards, isClient]);
 
   const addCard = useCallback((cardData: Omit<WishCardData, 'id' | 'createdAt' | 'position' | 'reactions'>) => {
+    if(!isClient) return;
+
     const newCard: WishCardData = {
       id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
       position: {
-        x: window.innerWidth / 2 - 150 + (Math.random() - 0.5) * 100,
-        y: window.innerHeight / 2 - 200 + (Math.random() - 0.5) * 100,
+        x: Math.random() * (window.innerWidth - 350), 
+        y: 100 + Math.random() * (window.innerHeight - 450),
       },
       ...cardData,
       imageUrl: cardData.imageUrl || 'https://i.imgur.com/Ip7b2C1.png',
@@ -48,7 +50,7 @@ export function useWishBoard() {
       },
     };
     setCards((prev) => [...prev, newCard]);
-  }, []);
+  }, [isClient]);
 
   const updateCard = useCallback((updatedCard: WishCardData) => {
     setCards((prev) =>
@@ -62,5 +64,5 @@ export function useWishBoard() {
     );
   }, []);
 
-  return { cards, addCard, updateCard, updateCardPosition };
+  return { cards, addCard, updateCard, updateCardPosition, isClient };
 }
