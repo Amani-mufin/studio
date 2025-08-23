@@ -15,14 +15,14 @@ export default function Home() {
   return (
     <main className="relative h-screen w-screen overflow-auto bg-background font-body">
       <Header addCard={addCard} />
-      {isClient && (
+      {isClient ? (
         <WishBoard
           cards={cards}
           updateCard={updateCard}
           deleteCard={deleteCard}
           updateCardPosition={updateCardPosition}
         />
-      )}
+      ) : null}
     </main>
   );
 }

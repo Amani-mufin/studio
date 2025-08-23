@@ -8,6 +8,7 @@ const LOCAL_STORAGE_KEY = 'wish-weaver-board';
 export function useWishBoard() {
   const [cards, setCards] = useState<WishCardData[]>([]);
 
+  // This effect runs only on the client, after the initial render.
   useEffect(() => {
     try {
       const storedCards = window.localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -19,11 +20,15 @@ export function useWishBoard() {
     }
   }, []);
 
+  // This effect saves cards to localStorage whenever they change.
+  // It's guarded by a check to ensure it doesn't run on the server.
   useEffect(() => {
-    try {
-      window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cards));
-    } catch (error) {
-      console.error('Failed to save cards to local storage', error);
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cards));
+      } catch (error) {
+        console.error('Failed to save cards to local storage', error);
+      }
     }
   }, [cards]);
 
