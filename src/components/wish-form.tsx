@@ -162,7 +162,7 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
                     <RadioGroup
                       onValueChange={field.onChange}
                       defaultValue={field.value}
-                      className="grid grid-cols-3 gap-4"
+                      className="grid grid-cols-2 sm:grid-cols-3 gap-4"
                     >
                       {DEFAULT_IMAGES.map((url, index) => (
                         <FormItem key={url} className="flex items-center space-x-3 space-y-0">
@@ -193,7 +193,7 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
                     <FormItem>
                       <FormLabel>Card Appearance</FormLabel>
                       <FormControl>
-                        <div className="grid grid-cols-3 gap-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                           {[
                             { value: "bg-gradient-pink", label: "Pink" },
                             { value: "bg-gradient-blue", label: "Blue" },
