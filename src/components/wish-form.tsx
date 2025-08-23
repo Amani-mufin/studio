@@ -113,7 +113,7 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
           </Button>
         ) : (
           <Button>
-            <Plus className="mr-2 h-4 w-4" /> Create a Wish
+            <Plus className="mr-2 h-4 w-4" /> Share a wish
           </Button>
         )}
       </DialogTrigger>
