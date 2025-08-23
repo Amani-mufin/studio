@@ -5,7 +5,7 @@ import { useWishBoard } from '@/hooks/use-wish-board';
 import { useEffect, useState } from 'react';
 
 export default function Home() {
-  const { cards, addCard, updateCard, deleteCard, updateCardPosition } = useWishBoard();
+  const { cards, addCard, updateCard, updateCardPosition } = useWishBoard();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -19,7 +19,6 @@ export default function Home() {
         <WishBoard
           cards={cards}
           updateCard={updateCard}
-          deleteCard={deleteCard}
           updateCardPosition={updateCardPosition}
         />
       ) : null}

@@ -7,9 +7,10 @@ const LOCAL_STORAGE_KEY = 'wish-weaver-board';
 
 export function useWishBoard() {
   const [cards, setCards] = useState<WishCardData[]>([]);
+  const [isMounted, setIsMounted] = useState(false);
 
-  // This effect runs only on the client, after the initial render.
   useEffect(() => {
+    setIsMounted(true);
     try {
       const storedCards = window.localStorage.getItem(LOCAL_STORAGE_KEY);
       if (storedCards) {
@@ -20,17 +21,15 @@ export function useWishBoard() {
     }
   }, []);
 
-  // This effect saves cards to localStorage whenever they change.
-  // It's guarded by a check to ensure it doesn't run on the server.
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (isMounted) {
       try {
         window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cards));
       } catch (error) {
         console.error('Failed to save cards to local storage', error);
       }
     }
-  }, [cards]);
+  }, [cards, isMounted]);
 
   const addCard = useCallback((cardData: Omit<WishCardData, 'id' | 'createdAt' | 'position' | 'reactions'>) => {
     const newCard: WishCardData = {
@@ -57,15 +56,11 @@ export function useWishBoard() {
     );
   }, []);
 
-  const deleteCard = useCallback((id: string) => {
-    setCards((prev) => prev.filter((card) => card.id !== id));
-  }, []);
-
   const updateCardPosition = useCallback((id: string, position: { x: number; y: number }) => {
     setCards((prev) =>
       prev.map((card) => (card.id === id ? { ...card, position } : card))
     );
   }, []);
 
-  return { cards, addCard, updateCard, deleteCard, updateCardPosition };
+  return { cards, addCard, updateCard, updateCardPosition };
 }

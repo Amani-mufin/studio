@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import type { WishCardData } from '@/lib/types';
+import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -37,6 +38,8 @@ import {
 } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
   wish: z.string().min(1, 'A wish is required.'),
@@ -63,6 +66,13 @@ const FONT_OPTIONS = [
   { label: 'Serif', value: 'serif' },
 ];
 
+const DEFAULT_IMAGES = [
+  'https://i.imgur.com/Ip7b2C1.png',
+  'https://placehold.co/600x400.png',
+  'https://placehold.co/600x401.png',
+  'https://placehold.co/600x402.png',
+];
+
 export function WishForm({ cardData, onSave }: WishFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const isEditing = !!cardData;
@@ -70,7 +80,7 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
   const defaultValues: FormValues = {
     wish: cardData?.wish ?? '',
     name: cardData?.name ?? '',
-    imageUrl: cardData?.imageUrl ?? '',
+    imageUrl: cardData?.imageUrl ?? DEFAULT_IMAGES[0],
     style: cardData?.style ?? {
       backgroundColor: '#111827',
       textColor: '#ffffff',
@@ -99,7 +109,7 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        form.setValue('imageUrl', reader.result as string);
+        form.setValue('imageUrl', reader.result as string, { shouldValidate: true });
       };
       reader.readAsDataURL(file);
     }
@@ -153,12 +163,45 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
                 </FormItem>
               )}
             />
-            <FormItem>
-              <FormLabel>Photo (Optional)</FormLabel>
+            
+            <FormField
+              control={form.control}
+              name="imageUrl"
+              render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormLabel>Photo (Optional)</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="grid grid-cols-2 gap-4"
+                    >
+                      {DEFAULT_IMAGES.map((url, index) => (
+                        <FormItem key={url} className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value={url} id={`image-${index}`} className="peer sr-only" />
+                          </FormControl>
+                          <Label
+                            htmlFor={`image-${index}`}
+                            className="relative flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer w-full aspect-video"
+                          >
+                            <Image src={url} alt={`Default image ${index + 1}`} layout="fill" objectFit="cover" className="rounded-sm" data-ai-hint={index === 0 ? "celebration event" : "abstract background"} />
+                          </Label>
+                        </FormItem>
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormItem>
+              <FormLabel>Or Upload Your Own</FormLabel>
               <FormControl>
                 <Input type="file" accept="image/*" onChange={handleFileChange} />
               </FormControl>
             </FormItem>
+
 
             <div className="space-y-4 pt-4 border-t">
               <h3 className="text-lg font-medium">Customize Card</h3>

@@ -13,32 +13,19 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Trash2, Wand2, Loader, GripVertical, Download, Heart, PartyPopper, Hand } from 'lucide-react';
+import { Wand2, Loader, GripVertical, Download, Heart, PartyPopper, Hand } from 'lucide-react';
 import { WishForm } from './wish-form';
 import { getPoemAction } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import * as htmlToImage from 'html-to-image';
 
 interface WishCardProps {
   card: WishCardData;
   updateCard: (card: WishCardData) => void;
-  deleteCard: (id: string) => void;
   updateCardPosition: (id: string, position: { x: number; y: number }) => void;
 }
 
-export function WishCard({ card, updateCard, deleteCard, updateCardPosition }: WishCardProps) {
+export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps) {
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
   const cardRef = useRef<HTMLDivElement>(null);
@@ -183,25 +170,6 @@ export function WishCard({ card, updateCard, deleteCard, updateCardPosition }: W
           <Button variant="ghost" size="icon" aria-label="Download card" onClick={handleDownload}>
             <Download className="h-4 w-4" />
           </Button>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Delete card">
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will permanently delete this wish. This action cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => deleteCard(card.id)}>Delete</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
         </div>
       </CardFooter>
     </Card>
