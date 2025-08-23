@@ -131,7 +131,7 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
     <Card
       ref={cardRef}
       className={cn(
-        "absolute w-[300px] min-h-[150px] shadow-lg transition-all duration-300 ease-in-out hover:shadow-primary/50 hover:scale-105 group"
+        "absolute w-[300px] min-h-[150px] transition-all duration-300 ease-in-out hover:scale-105 group"
       )}
       style={{
         transform: `translate(${card.position.x}px, ${card.position.y}px)`,
