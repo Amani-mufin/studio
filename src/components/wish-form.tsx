@@ -35,7 +35,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
@@ -47,7 +46,6 @@ const formSchema = z.object({
     background: z.string(),
     textColor: z.string(),
     fontFamily: z.string(),
-    fontSize: z.number(),
   }),
 });
 
@@ -61,7 +59,9 @@ interface WishFormProps {
 const FONT_OPTIONS = [
   { label: 'Body (Inter)', value: 'Inter, sans-serif' },
   { label: 'Headline (Space Grotesk)', value: 'Space Grotesk, sans-serif' },
-  { label: 'Serif', value: 'serif' },
+  { label: 'Serif (Playfair Display)', value: 'Playfair Display, serif' },
+  { label: 'Sans-Serif (Lato)', value: 'Lato, sans-serif' },
+  { label: 'Monospace (Roboto Mono)', value: 'Roboto Mono, monospace' },
 ];
 
 const DEFAULT_IMAGES = [
@@ -85,7 +85,6 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
       background: 'bg-gradient-pink',
       textColor: '#ffffff',
       fontFamily: 'Inter, sans-serif',
-      fontSize: 16,
     },
   };
 
@@ -241,22 +240,6 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
                         ))}
                       </SelectContent>
                     </Select>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="style.fontSize"
-                render={({ field: { value, onChange } }) => (
-                  <FormItem>
-                    <Label>Font Size: {value}px</Label>
-                    <Slider
-                      min={12}
-                      max={24}
-                      step={1}
-                      defaultValue={[value]}
-                      onValueChange={(vals) => onChange(vals[0])}
-                    />
                   </FormItem>
                 )}
               />

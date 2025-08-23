@@ -137,10 +137,9 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
         transform: `translate(${card.position.x}px, ${card.position.y}px)`,
         color: card.style.textColor,
         fontFamily: card.style.fontFamily,
-        fontSize: `${card.style.fontSize}px`,
-        ...(backgroundStyle.startsWith('#')
+        ...backgroundStyle.startsWith('#')
           ? { backgroundColor: backgroundStyle }
-          : {}),
+          : {},
       }}
       data-background-class={!backgroundStyle.startsWith('#') ? backgroundStyle : ''}
     >

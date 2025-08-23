@@ -15,7 +15,6 @@ export interface WishCardData {
     background: string;
     textColor: string;
     fontFamily: string;
-    fontSize: number;
   };
   reactions: {
     love: number;
