@@ -1,7 +1,7 @@
 'use client';
 
-import type { WishCardData } from '@/lib/types';
-import { useState, useRef, type MouseEvent, useTransition } from 'react';
+import type { WishCardData, ReactionType } from '@/lib/types';
+import { useState, useRef, type MouseEvent, useTransition, useCallback } from 'react';
 import { format } from 'date-fns';
 import Image from 'next/image';
 import {
@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Trash2, Wand2, Loader, GripVertical } from 'lucide-react';
+import { Trash2, Wand2, Loader, GripVertical, Download, Heart, PartyPopper, Hand } from 'lucide-react';
 import { WishForm } from './wish-form';
 import { getPoemAction } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
@@ -29,6 +29,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import * as htmlToImage from 'html-to-image';
 
 interface WishCardProps {
   card: WishCardData;
@@ -48,8 +49,8 @@ export function WishCard({ card, updateCard, deleteCard, updateCardPosition }: W
     if (!cardRef.current) return;
     isDragging.current = true;
     dragStartPos.current = {
-      x: e.clientX - card.position.x,
-      y: e.clientY - card.position.y,
+      x: e.clientX,
+      y: e.clientY,
     };
     document.addEventListener('mousemove', handleDragMove);
     document.addEventListener('mouseup', handleDragEnd, { once: true });
@@ -59,10 +60,11 @@ export function WishCard({ card, updateCard, deleteCard, updateCardPosition }: W
 
   const handleDragMove = (e: globalThis.MouseEvent) => {
     if (!isDragging.current || !cardRef.current) return;
-    const newX = e.clientX - dragStartPos.current.x;
-    const newY = e.clientY - dragStartPos.current.y;
-    cardRef.current.style.left = `${newX}px`;
-    cardRef.current.style.top = `${newY}px`;
+    const dx = e.clientX - dragStartPos.current.x;
+    const dy = e.clientY - dragStartPos.current.y;
+    const newX = card.position.x + dx;
+    const newY = card.position.y + dy;
+    cardRef.current.style.transform = `translate(${newX}px, ${newY}px)`;
   };
 
   const handleDragEnd = (e: globalThis.MouseEvent) => {
@@ -71,8 +73,11 @@ export function WishCard({ card, updateCard, deleteCard, updateCardPosition }: W
     document.removeEventListener('mousemove', handleDragMove);
     cardRef.current.style.cursor = 'grab';
     cardRef.current.style.zIndex = '1';
-    const newX = e.clientX - dragStartPos.current.x;
-    const newY = e.clientY - dragStartPos.current.y;
+    const dx = e.clientX - dragStartPos.current.x;
+    const dy = e.clientY - dragStartPos.current.y;
+    const newX = card.position.x + dx;
+    const newY = card.position.y + dy;
+    cardRef.current.style.transform = `translate(${newX}px, ${newY}px)`;
     updateCardPosition(card.id, { x: newX, y: newY });
   };
 
@@ -95,13 +100,35 @@ export function WishCard({ card, updateCard, deleteCard, updateCardPosition }: W
     });
   };
 
+  const handleDownload = useCallback(() => {
+    if (cardRef.current) {
+      htmlToImage.toJpeg(cardRef.current, { quality: 0.95 })
+        .then((dataUrl) => {
+          const link = document.createElement('a');
+          link.download = `wish-${card.id}.jpeg`;
+          link.href = dataUrl;
+          link.click();
+        });
+    }
+  }, [card.id]);
+
+  const handleReaction = (reactionType: ReactionType) => {
+    const updatedCard = {
+      ...card,
+      reactions: {
+        ...card.reactions,
+        [reactionType]: card.reactions[reactionType] + 1,
+      },
+    };
+    updateCard(updatedCard);
+  };
+  
   return (
     <Card
       ref={cardRef}
       className="absolute w-[300px] min-h-[150px] shadow-lg transition-all duration-300 ease-in-out hover:shadow-primary/50 hover:scale-105 group"
       style={{
-        left: card.position.x,
-        top: card.position.y,
+        transform: `translate(${card.position.x}px, ${card.position.y}px)`,
         backgroundColor: card.style.backgroundColor,
         color: card.style.textColor,
         fontFamily: card.style.fontFamily,
@@ -141,6 +168,9 @@ export function WishCard({ card, updateCard, deleteCard, updateCardPosition }: W
       <CardFooter className="flex justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <div className="flex gap-1">
           <WishForm cardData={card} onSave={updateCard} />
+          <Button variant="ghost" size="icon" aria-label="Download card" onClick={handleDownload}>
+            <Download className="h-4 w-4" />
+          </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="ghost" size="icon" aria-label="Delete card">
@@ -152,32 +182,4 @@ export function WishCard({ card, updateCard, deleteCard, updateCardPosition }: W
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>
                   This will permanently delete this wish. This action cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => deleteCard(card.id)}>Delete</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-        {!card.poem && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={generatePoem}
-            disabled={isPending}
-            className="bg-transparent"
-          >
-            {isPending ? (
-              <Loader className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Wand2 className="mr-2 h-4 w-4" />
-            )}
-            Generate Poem
-          </Button>
-        )}
-      </CardFooter>
-    </Card>
-  );
-}
+                </
