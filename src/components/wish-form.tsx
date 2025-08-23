@@ -71,6 +71,8 @@ const DEFAULT_IMAGES = [
   'https://asset.cloudinary.com/sirsuccess/image/upload/v1715873223/64ca296c2634008ad0f107f963d04782.jpg',
   'https://asset.cloudinary.com/sirsuccess/image/upload/v1715873199/dc94b7912a264827d8145e06929d3ee4.jpg',
   'https://i.imgur.com/8p5cW6h.jpeg',
+  'https://placehold.co/100x100.png',
+  'https://placehold.co/100x100.png',
 ];
 
 export function WishForm({ cardData, onSave }: WishFormProps) {
@@ -102,17 +104,6 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
     }
     setIsOpen(false);
     form.reset(defaultValues);
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        form.setValue('imageUrl', reader.result as string, { shouldValidate: true });
-      };
-      reader.readAsDataURL(file);
-    }
   };
 
   return (
@@ -169,12 +160,12 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
               name="imageUrl"
               render={({ field }) => (
                 <FormItem className="space-y-3">
-                  <FormLabel>Photo (Optional)</FormLabel>
+                  <FormLabel>Photo</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
                       defaultValue={field.value}
-                      className="grid grid-cols-4 gap-4"
+                      className="grid grid-cols-3 gap-4"
                     >
                       {DEFAULT_IMAGES.map((url, index) => (
                         <FormItem key={url} className="flex items-center space-x-3 space-y-0">
@@ -195,13 +186,6 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
                 </FormItem>
               )}
             />
-             <FormItem>
-              <FormLabel>Or Upload Your Own</FormLabel>
-              <FormControl>
-                <Input type="file" accept="image/*" onChange={handleFileChange} />
-              </FormControl>
-            </FormItem>
-
 
             <div className="space-y-4 pt-4 border-t">
               <h3 className="text-lg font-medium">Customize Card</h3>
