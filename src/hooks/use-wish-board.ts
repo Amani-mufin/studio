@@ -45,8 +45,7 @@ export function useWishBoard() {
   }, [cards, isClient]);
 
   const addCard = useCallback((cardData: Omit<WishCardData, 'id' | 'createdAt' | 'position' | 'reactions'>) => {
-    if(!isClient) return;
-
+    // This function is only called on the client after user interaction, so window is safe.
     const newCard: WishCardData = {
       id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
@@ -63,7 +62,7 @@ export function useWishBoard() {
       },
     };
     setCards((prev) => [...prev, newCard]);
-  }, [isClient]);
+  }, []);
 
   const updateCard = useCallback((updatedCard: WishCardData) => {
     setCards((prev) =>
