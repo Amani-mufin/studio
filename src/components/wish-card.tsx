@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Wand2, Loader, GripVertical, Download, Heart, PartyPopper, Hand, Read } from 'lucide-react';
+import { Wand2, Loader, GripVertical, Download, Heart, PartyPopper, Hand } from 'lucide-react';
 import { WishForm } from './wish-form';
 import { getPoemAction } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
@@ -124,6 +124,8 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
     updateCard(updatedCard);
   };
   
+  const backgroundStyle = card.style?.background || 'bg-gradient-pink';
+
   return (
     <TooltipProvider>
     <Card
@@ -136,11 +138,11 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
         color: card.style.textColor,
         fontFamily: card.style.fontFamily,
         fontSize: `${card.style.fontSize}px`,
-        ...card.style.background.startsWith('#')
-          ? { backgroundColor: card.style.background }
-          : {},
+        ...(backgroundStyle.startsWith('#')
+          ? { backgroundColor: backgroundStyle }
+          : {}),
       }}
-      data-background-class={!card.style.background.startsWith('#') ? card.style.background : ''}
+      data-background-class={!backgroundStyle.startsWith('#') ? backgroundStyle : ''}
     >
       <CardHeader>
         <CardTitle className="flex justify-between items-start">
@@ -173,7 +175,7 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
           </div>
         )}
         <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
-          <p ref={wishTextRef} className={cn("whitespace-pre-wrap", !isExpanded && "truncate")}>
+          <p ref={wishTextRef} className={cn("whitespace-pre-wrap", !isExpanded && "line-clamp-1")}>
             {card.wish}
           </p>
           <CollapsibleContent>
