@@ -31,7 +31,7 @@ interface WishCardProps {
 
 export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps) {
   const { toast } = useToast();
-  const [isPending, startTransition] = useTransition();
+  const [isPoemPending, startPoemTransition] = useTransition();
   const [isExpanded, setIsExpanded] = useState(false);
   const [showReadMore, setShowReadMore] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -83,7 +83,7 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
   }, [card.id, updateCardPosition, handleDragMove]);
 
   const generatePoem = () => {
-    startTransition(async () => {
+    startPoemTransition(async () => {
       const result = await getPoemAction(card.wish);
       if (result.error) {
         toast({
@@ -137,9 +137,9 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
         transform: `translate(${card.position.x}px, ${card.position.y}px)`,
         color: card.style.textColor,
         fontFamily: card.style.fontFamily,
-        ...backgroundStyle.startsWith('#')
+        ...(backgroundStyle.startsWith('#')
           ? { backgroundColor: backgroundStyle }
-          : {},
+          : {}),
       }}
       data-background-class={!backgroundStyle.startsWith('#') ? backgroundStyle : ''}
     >
@@ -229,8 +229,8 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Generate poem" onClick={generatePoem} disabled={isPending} className="hover:bg-white/20">
-                {isPending ? <Loader className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+              <Button variant="ghost" size="icon" aria-label="Generate poem" onClick={generatePoem} disabled={isPoemPending} className="hover:bg-white/20">
+                {isPoemPending ? <Loader className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
               </Button>
             </TooltipTrigger>
             <TooltipContent>

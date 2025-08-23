@@ -1,79 +1,116 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useTransition } from 'react';
 import type { WishCardData } from '@/lib/types';
-
-const LOCAL_STORAGE_KEY = 'wish-weaver-board';
+import {
+  getWishes,
+  addWish,
+  updateWish,
+  updateWishPosition as updateWishPositionAction,
+} from '@/app/actions';
+import { useToast } from './use-toast';
 
 export function useWishBoard() {
   const [cards, setCards] = useState<WishCardData[]>([]);
-  const [isClient, setIsClient] = useState(false);
+  const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    setIsClient(true);
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const boardData = urlParams.get('board');
+    startTransition(async () => {
+      const fetchedWishes = await getWishes();
+      setCards(fetchedWishes);
+    });
+  }, []);
 
-      if (boardData) {
-        const decodedData = atob(boardData);
-        setCards(JSON.parse(decodedData));
-        // Optionally, you can clear the URL parameter after loading
-        // window.history.replaceState({}, document.title, window.location.pathname);
+  const addCard = useCallback(
+    async (
+      cardData: Omit<WishCardData, 'id' | 'createdAt' | 'position' | 'reactions'>
+    ) => {
+      // This function is only called on the client after user interaction, so window is safe.
+      const newCardData: Omit<WishCardData, 'id' | 'createdAt'> = {
+        position: {
+          x: Math.random() * (window.innerWidth - 350),
+          y: 100 + Math.random() * (window.innerHeight - 450),
+        },
+        ...cardData,
+        imageUrl: cardData.imageUrl || 'https://i.imgur.com/Ip7b2C1.png',
+        reactions: {
+          love: 0,
+          celebration: 0,
+        },
+      };
+
+      // Optimistic update
+      const tempId = `temp-${Date.now()}`;
+      const optimisticCard: WishCardData = {
+        ...newCardData,
+        id: tempId,
+        createdAt: new Date().toISOString(),
+      };
+      setCards((prev) => [...prev, optimisticCard]);
+
+      const result = await addWish(newCardData);
+      
+      if ('error' in result) {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: result.error,
+        });
+        // Revert optimistic update
+        setCards((prev) => prev.filter((card) => card.id !== tempId));
       } else {
-        const storedCards = window.localStorage.getItem(LOCAL_STORAGE_KEY);
-        if (storedCards) {
-          setCards(JSON.parse(storedCards));
-        }
+        // Replace optimistic card with real one from server
+        setCards((prev) =>
+          prev.map((card) => (card.id === tempId ? result : card))
+        );
       }
-    } catch (error) {
-      console.error('Failed to load cards', error);
-    }
-  }, []);
+    },
+    [toast]
+  );
 
-  useEffect(() => {
-    if (isClient) {
-      try {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (!urlParams.has('board')) { // Only save to LS if not viewing a shared board
-          window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cards));
-        }
-      } catch (error) {
-        console.error('Failed to save cards to local storage', error);
+  const updateCard = useCallback(
+    async (updatedCard: WishCardData) => {
+      // Optimistic update
+      setCards((prev) =>
+        prev.map((card) => (card.id === updatedCard.id ? updatedCard : card))
+      );
+      const { id, ...dataToUpdate } = updatedCard;
+      const result = await updateWish(id, dataToUpdate);
+
+      if (result.error) {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: result.error,
+        });
+        // Ideally, you'd revert the state here, but that's more complex.
+        // For now, we just show an error.
       }
-    }
-  }, [cards, isClient]);
+    },
+    [toast]
+  );
 
-  const addCard = useCallback((cardData: Omit<WishCardData, 'id' | 'createdAt' | 'position' | 'reactions'>) => {
-    // This function is only called on the client after user interaction, so window is safe.
-    const newCard: WishCardData = {
-      id: crypto.randomUUID(),
-      createdAt: new Date().toISOString(),
-      position: {
-        x: Math.random() * (window.innerWidth - 350), 
-        y: 100 + Math.random() * (window.innerHeight - 450),
-      },
-      ...cardData,
-      imageUrl: cardData.imageUrl || 'https://i.imgur.com/Ip7b2C1.png',
-      reactions: {
-        love: 0,
-        celebration: 0,
-      },
-    };
-    setCards((prev) => [...prev, newCard]);
-  }, []);
+  const updateCardPosition = useCallback(
+    async (id: string, position: { x: number; y: number }) => {
+      // Optimistic update
+      setCards((prev) =>
+        prev.map((card) => (card.id === id ? { ...card, position } : card))
+      );
+      
+      const result = await updateWishPositionAction(id, position);
+      
+      if (result.error) {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: result.error,
+        });
+        // Revert could be implemented here as well.
+      }
+    },
+    [toast]
+  );
 
-  const updateCard = useCallback((updatedCard: WishCardData) => {
-    setCards((prev) =>
-      prev.map((card) => (card.id === updatedCard.id ? updatedCard : card))
-    );
-  }, []);
-
-  const updateCardPosition = useCallback((id: string, position: { x: number; y: number }) => {
-    setCards((prev) =>
-      prev.map((card) => (card.id === id ? { ...card, position } : card))
-    );
-  }, []);
-
-  return { cards, addCard, updateCard, updateCardPosition };
+  return { cards, addCard, updateCard, updateCardPosition, isLoading: isPending };
 }
