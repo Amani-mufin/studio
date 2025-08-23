@@ -67,9 +67,9 @@ const FONT_OPTIONS = [
 ];
 
 const DEFAULT_IMAGES = [
-  'https://placehold.co/600x400.png',
-  'https://placehold.co/600x400.png',
-  'https://placehold.co/600x400.png',
+  'https://asset.cloudinary.com/sirsuccess/image/upload/v1715873243/2074ba736a35c360db8997a4d9bed277.jpg',
+  'https://asset.cloudinary.com/sirsuccess/image/upload/v1715873223/64ca296c2634008ad0f107f963d04782.jpg',
+  'https://asset.cloudinary.com/sirsuccess/image/upload/v1715873199/dc94b7912a264827d8145e06929d3ee4.jpg',
   'https://placehold.co/600x400.png',
 ];
 
