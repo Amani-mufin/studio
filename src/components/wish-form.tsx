@@ -70,7 +70,7 @@ const DEFAULT_IMAGES = [
   'https://asset.cloudinary.com/sirsuccess/image/upload/v1715873243/2074ba736a35c360db8997a4d9bed277.jpg',
   'https://asset.cloudinary.com/sirsuccess/image/upload/v1715873223/64ca296c2634008ad0f107f963d04782.jpg',
   'https://asset.cloudinary.com/sirsuccess/image/upload/v1715873199/dc94b7912a264827d8145e06929d3ee4.jpg',
-  'https://placehold.co/600x400.png',
+  'https://i.imgur.com/8p5cW6h.jpeg',
 ];
 
 export function WishForm({ cardData, onSave }: WishFormProps) {
@@ -185,7 +185,7 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
                             htmlFor={`image-${index}`}
                             className="relative flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer w-full aspect-video"
                           >
-                            <Image src={url} alt={`Default image ${index + 1}`} layout="fill" objectFit="cover" className="rounded-sm" data-ai-hint={index === 3 ? "abstract background" : "celebration event"} />
+                            <Image src={url} alt={`Default image ${index + 1}`} layout="fill" objectFit="cover" className="rounded-sm" data-ai-hint={index < 3 ? "celebration event" : "man portrait"} />
                           </Label>
                         </FormItem>
                       ))}
