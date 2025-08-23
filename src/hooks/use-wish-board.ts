@@ -32,6 +32,9 @@ export function useWishBoard() {
   }, [cards, isMounted]);
 
   const addCard = useCallback((cardData: Omit<WishCardData, 'id' | 'createdAt' | 'position' | 'reactions'>) => {
+    // This check ensures window is only accessed on the client.
+    if (typeof window === 'undefined') return;
+
     const newCard: WishCardData = {
       id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
@@ -66,5 +69,6 @@ export function useWishBoard() {
     );
   }, []);
 
-  return { cards, addCard, updateCard, deleteCard, updateCardPosition };
+  // Only return cards if the component is mounted on the client
+  return { cards: isMounted ? cards : [], addCard, updateCard, deleteCard, updateCardPosition };
 }
