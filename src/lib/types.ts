@@ -1,4 +1,4 @@
-export type ReactionType = 'love' | 'celebration' | 'clap';
+export type ReactionType = 'love' | 'celebration';
 
 export interface WishCardData {
   id: string;
@@ -20,6 +20,5 @@ export interface WishCardData {
   reactions: {
     love: number;
     celebration: number;
-    clap: number;
   };
 }

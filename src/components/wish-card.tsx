@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Wand2, Loader, GripVertical, Download, Heart, PartyPopper, Hand } from 'lucide-react';
+import { Wand2, Loader, GripVertical, Download, Heart, PartyPopper } from 'lucide-react';
 import { WishForm } from './wish-form';
 import { getPoemAction } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
@@ -131,7 +131,7 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
     <Card
       ref={cardRef}
       className={cn(
-        "absolute w-[300px] min-h-[150px] transition-all duration-300 ease-in-out hover:scale-105 group"
+        "absolute w-[300px] min-h-[150px] transition-all duration-300 ease-in-out hover:animate-shake group"
       )}
       style={{
         transform: `translate(${card.position.x}px, ${card.position.y}px)`,
@@ -216,17 +216,6 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
             </TooltipTrigger>
             <TooltipContent>
               <p>Celebrate</p>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Clap" onClick={() => handleReaction('clap')} className="flex items-center gap-1 px-2">
-                <Hand className="h-4 w-4" />
-                <span className="text-xs">{card.reactions.clap || 0}</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Clap</p>
             </TooltipContent>
           </Tooltip>
         </div>

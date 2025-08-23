@@ -58,7 +58,6 @@ export function useWishBoard() {
       reactions: {
         love: 0,
         celebration: 0,
-        clap: 0,
       },
     };
     setCards((prev) => [...prev, newCard]);
