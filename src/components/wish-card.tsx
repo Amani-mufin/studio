@@ -13,13 +13,14 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Wand2, Loader, GripVertical, Download, Heart, PartyPopper, Hand } from 'lucide-react';
+import { Wand2, Loader, GripVertical, Download, Heart, PartyPopper, Hand, Read } from 'lucide-react';
 import { WishForm } from './wish-form';
 import { getPoemAction } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import * as htmlToImage from 'html-to-image';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 
 interface WishCardProps {
@@ -31,6 +32,7 @@ interface WishCardProps {
 export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps) {
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
+  const [isExpanded, setIsExpanded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const dragStartPos = useRef({ x: 0, y: 0 });
   const isDragging = useRef(false);
@@ -153,12 +155,23 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
             <Image src={card.imageUrl} alt={card.name} layout="fill" objectFit="cover" data-ai-hint="celebration event" />
           </div>
         )}
-        <p className="whitespace-pre-wrap">{card.wish}</p>
-        {card.poem && (
-          <div className="mt-4 p-3 border-l-4 border-primary/50 italic bg-white/10 rounded-r-md">
-            <p className="whitespace-pre-wrap text-sm">{card.poem}</p>
-          </div>
-        )}
+        <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+          <p className={cn("whitespace-pre-wrap", !isExpanded && "truncate")}>
+            {card.wish}
+          </p>
+          <CollapsibleContent>
+            {card.poem && (
+              <div className="mt-4 p-3 border-l-4 border-primary/50 italic bg-white/10 rounded-r-md">
+                <p className="whitespace-pre-wrap text-sm">{card.poem}</p>
+              </div>
+            )}
+          </CollapsibleContent>
+          <CollapsibleTrigger asChild>
+            <Button variant="link" className="p-0 h-auto text-xs mt-2" style={{color: card.style.textColor}}>
+              {isExpanded ? 'Read less' : 'Read more'}
+            </Button>
+          </CollapsibleTrigger>
+        </Collapsible>
       </CardContent>
       <CardFooter className="flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <div className="flex gap-1 items-center">
