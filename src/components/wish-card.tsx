@@ -19,6 +19,7 @@ import { getPoemAction } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import * as htmlToImage from 'html-to-image';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
 
 
 interface WishCardProps {
@@ -111,10 +112,12 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
     <TooltipProvider>
     <Card
       ref={cardRef}
-      className="absolute w-[300px] min-h-[150px] shadow-lg transition-all duration-300 ease-in-out hover:shadow-primary/50 hover:scale-105 group"
+      className={cn(
+        "absolute w-[300px] min-h-[150px] shadow-lg transition-all duration-300 ease-in-out hover:shadow-primary/50 hover:scale-105 group",
+        card.style.background
+      )}
       style={{
         transform: `translate(${card.position.x}px, ${card.position.y}px)`,
-        backgroundColor: card.style.backgroundColor,
         color: card.style.textColor,
         fontFamily: card.style.fontFamily,
         fontSize: `${card.style.fontSize}px`,

@@ -86,3 +86,18 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .bg-gradient-pink {
+    background-image: linear-gradient(to right, #ff7e5f, #feb47b);
+  }
+  .bg-gradient-blue {
+    background-image: linear-gradient(to right, #00c6ff, #0072ff);
+  }
+  .bg-gradient-purple {
+    background-image: linear-gradient(to right, #6a11cb, #2575fc);
+  }
+  .bg-gradient-green {
+    background-image: linear-gradient(to right, #11998e, #38ef7d);
+  }
+}

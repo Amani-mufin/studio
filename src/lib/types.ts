@@ -12,7 +12,7 @@ export interface WishCardData {
     y: number;
   };
   style: {
-    backgroundColor: string;
+    background: string;
     textColor: string;
     fontFamily: string;
     fontSize: number;

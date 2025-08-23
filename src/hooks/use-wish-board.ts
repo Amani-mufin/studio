@@ -12,19 +12,32 @@ export function useWishBoard() {
   useEffect(() => {
     setIsClient(true);
     try {
-      const storedCards = window.localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (storedCards) {
-        setCards(JSON.parse(storedCards));
+      const urlParams = new URLSearchParams(window.location.search);
+      const boardData = urlParams.get('board');
+
+      if (boardData) {
+        const decodedData = atob(boardData);
+        setCards(JSON.parse(decodedData));
+        // Optionally, you can clear the URL parameter after loading
+        // window.history.replaceState({}, document.title, window.location.pathname);
+      } else {
+        const storedCards = window.localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (storedCards) {
+          setCards(JSON.parse(storedCards));
+        }
       }
     } catch (error) {
-      console.error('Failed to load cards from local storage', error);
+      console.error('Failed to load cards', error);
     }
   }, []);
 
   useEffect(() => {
     if (isClient) {
       try {
-        window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cards));
+        const urlParams = new URLSearchParams(window.location.search);
+        if (!urlParams.has('board')) { // Only save to LS if not viewing a shared board
+          window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cards));
+        }
       } catch (error) {
         console.error('Failed to save cards to local storage', error);
       }
@@ -64,5 +77,5 @@ export function useWishBoard() {
     );
   }, []);
 
-  return { cards, addCard, updateCard, updateCardPosition, isClient };
+  return { cards, addCard, updateCard, updateCardPosition };
 }

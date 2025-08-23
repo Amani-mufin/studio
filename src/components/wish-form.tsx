@@ -28,7 +28,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, Edit } from 'lucide-react';
-import { ColorPicker } from './color-picker';
 import {
   Select,
   SelectContent,
@@ -39,14 +38,13 @@ import {
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
   wish: z.string().min(1, 'A wish is required.'),
   name: z.string().min(1, 'Your name is required.'),
   imageUrl: z.string().optional(),
   style: z.object({
-    backgroundColor: z.string(),
+    background: z.string(),
     textColor: z.string(),
     fontFamily: z.string(),
     fontSize: z.number(),
@@ -84,7 +82,7 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
     name: cardData?.name ?? '',
     imageUrl: cardData?.imageUrl ?? DEFAULT_IMAGES[0],
     style: cardData?.style ?? {
-      backgroundColor: '#111827',
+      background: 'bg-gradient-pink',
       textColor: '#ffffff',
       fontFamily: 'Inter, sans-serif',
       fontSize: 16,
@@ -189,26 +187,38 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
 
             <div className="space-y-4 pt-4 border-t">
               <h3 className="text-lg font-medium">Customize Card</h3>
-              <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="style.backgroundColor"
+                  name="style.background"
                   render={({ field }) => (
                     <FormItem>
-                      <ColorPicker label="Background" {...field} />
+                      <FormLabel>Card Appearance</FormLabel>
+                      <FormControl>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                          {[
+                            { value: "bg-gradient-pink", label: "Pink" },
+                            { value: "bg-gradient-blue", label: "Blue" },
+                            { value: "bg-gradient-purple", label: "Purple" },
+                            { value: "bg-gradient-green", label: "Green" },
+                          ].map((color) => (
+                            <button
+                              key={color.value}
+                              type="button"
+                              onClick={() => field.onChange(color.value)}
+                              className={`p-4 rounded-xl ${color.value} hover:scale-105 transition-transform ${
+                                field.value === color.value ? "ring-2 ring-primary" : ""
+                              }`}
+                              aria-label={`Select ${color.label} gradient`}
+                            >
+                              <div className="w-full h-8 rounded bg-white/20"></div>
+                            </button>
+                          ))}
+                        </div>
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="style.textColor"
-                  render={({ field }) => (
-                    <FormItem>
-                      <ColorPicker label="Text" {...field} />
-                    </FormItem>
-                  )}
-                />
-              </div>
               <FormField
                 control={form.control}
                 name="style.fontFamily"
