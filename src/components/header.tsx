@@ -14,7 +14,7 @@ export function Header({ addCard, cards }: HeaderProps) {
       <div className="flex items-center gap-2">
         <Logo className="h-8 w-8" />
         <h1 className="text-2xl md:text-3xl font-headline font-bold text-white">
-          Good wishes
+          Good Wishes
         </h1>
       </div>
       <div className="flex items-center gap-2">

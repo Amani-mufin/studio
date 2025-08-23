@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'Good wishes',
+  title: 'Good Wishes',
   description: 'A memory board for your special events.',
 };
 
