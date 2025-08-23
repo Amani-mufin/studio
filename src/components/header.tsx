@@ -12,8 +12,8 @@ export function Header({ addCard, cards }: HeaderProps) {
   return (
     <header className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-4 md:p-6 bg-background/50 backdrop-blur-sm">
       <div className="flex items-center gap-2">
-        <Logo className="h-8 w-8 text-primary" />
-        <h1 className="text-2xl md:text-3xl font-headline font-bold text-primary">
+        <Logo className="h-8 w-8" />
+        <h1 className="text-2xl md:text-3xl font-headline font-bold text-white">
           Good wishes
         </h1>
       </div>

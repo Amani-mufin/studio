@@ -14,7 +14,7 @@ export function Logo(props: SVGProps<SVGSVGElement>) {
         d="m183.33 216.64l-42.1-72.92h84.21l-42.11 72.92Z"
       />
       <path
-        fill="#1e2a4a"
+        fill="#ffffff"
         d="m120.31 39.36l-100.31 173.28h72.93l69.49-120.36l-42.11-72.92Z"
       />
     </svg>
