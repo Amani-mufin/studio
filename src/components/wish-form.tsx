@@ -116,9 +116,9 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-md max-h-screen overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit Wish' : 'Create a Wish'}</DialogTitle>
+          <DialogTitle>{isEditing ? 'Edit Wish' : 'Share a wish'}</DialogTitle>
           <DialogDescription>
             {isEditing ? 'Update the details of your wish.' : 'Share a wish for the memory board.'}
           </DialogDescription>
