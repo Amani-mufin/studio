@@ -1,7 +1,7 @@
 'use client';
 
 import type { WishCardData, ReactionType } from '@/lib/types';
-import { useState, useRef, type MouseEvent, useTransition, useCallback } from 'react';
+import { useState, useRef, type MouseEvent, useTransition, useCallback, useEffect } from 'react';
 import { format } from 'date-fns';
 import Image from 'next/image';
 import {
@@ -33,9 +33,23 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showReadMore, setShowReadMore] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+  const wishTextRef = useRef<HTMLParagraphElement>(null);
   const dragStartPos = useRef({ x: 0, y: 0 });
   const isDragging = useRef(false);
+
+  useEffect(() => {
+    if (card.poem) {
+      setShowReadMore(true);
+      return;
+    }
+    if (wishTextRef.current) {
+      // Show if text is truncated (overflows one line)
+      const isOverflowing = wishTextRef.current.scrollHeight > wishTextRef.current.clientHeight;
+      setShowReadMore(isOverflowing);
+    }
+  }, [card.poem, card.wish]);
 
   const handleDragStart = (e: MouseEvent<HTMLButtonElement>) => {
     if (!cardRef.current) return;
@@ -115,15 +129,18 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
     <Card
       ref={cardRef}
       className={cn(
-        "absolute w-[300px] min-h-[150px] shadow-lg transition-all duration-300 ease-in-out hover:shadow-primary/50 hover:scale-105 group",
-        card.style.background
+        "absolute w-[300px] min-h-[150px] shadow-lg transition-all duration-300 ease-in-out hover:shadow-primary/50 hover:scale-105 group"
       )}
       style={{
         transform: `translate(${card.position.x}px, ${card.position.y}px)`,
         color: card.style.textColor,
         fontFamily: card.style.fontFamily,
         fontSize: `${card.style.fontSize}px`,
+        ...card.style.background.startsWith('#')
+          ? { backgroundColor: card.style.background }
+          : {},
       }}
+      data-background-class={!card.style.background.startsWith('#') ? card.style.background : ''}
     >
       <CardHeader>
         <CardTitle className="flex justify-between items-start">
@@ -156,7 +173,7 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
           </div>
         )}
         <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
-          <p className={cn("whitespace-pre-wrap", !isExpanded && "truncate")}>
+          <p ref={wishTextRef} className={cn("whitespace-pre-wrap", !isExpanded && "truncate")}>
             {card.wish}
           </p>
           <CollapsibleContent>
@@ -166,11 +183,13 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
               </div>
             )}
           </CollapsibleContent>
-          <CollapsibleTrigger asChild>
-            <Button variant="link" className="p-0 h-auto text-xs mt-2" style={{color: card.style.textColor}}>
-              {isExpanded ? 'Read less' : 'Read more'}
-            </Button>
-          </CollapsibleTrigger>
+          {showReadMore && (
+            <CollapsibleTrigger asChild>
+              <Button variant="link" className="p-0 h-auto text-xs mt-2" style={{color: card.style.textColor}}>
+                {isExpanded ? 'Read less' : 'Read more'}
+              </Button>
+            </CollapsibleTrigger>
+          )}
         </Collapsible>
       </CardContent>
       <CardFooter className="flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
