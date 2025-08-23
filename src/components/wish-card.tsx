@@ -152,7 +152,7 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 cursor-grab group-hover:opacity-100 opacity-0 transition-opacity"
+                  className="h-8 w-8 cursor-grab group-hover:opacity-100 opacity-0 transition-opacity hover:bg-white/20"
                   onMouseDown={handleDragStart}
                   aria-label="Drag card"
                 >
@@ -198,7 +198,7 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
         <div className="flex gap-1 items-center">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Love" onClick={() => handleReaction('love')} className="flex items-center gap-1 px-2">
+              <Button variant="ghost" size="icon" aria-label="Love" onClick={() => handleReaction('love')} className="flex items-center gap-1 px-2 hover:bg-white/20">
                 <Heart className="h-4 w-4" /> 
                 <span className="text-xs">{card.reactions.love || 0}</span>
               </Button>
@@ -209,7 +209,7 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Celebrate" onClick={() => handleReaction('celebration')} className="flex items-center gap-1 px-2">
+              <Button variant="ghost" size="icon" aria-label="Celebrate" onClick={() => handleReaction('celebration')} className="flex items-center gap-1 px-2 hover:bg-white/20">
                 <PartyPopper className="h-4 w-4" />
                 <span className="text-xs">{card.reactions.celebration || 0}</span>
               </Button>
@@ -230,7 +230,7 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Generate poem" onClick={generatePoem} disabled={isPending}>
+              <Button variant="ghost" size="icon" aria-label="Generate poem" onClick={generatePoem} disabled={isPending} className="hover:bg-white/20">
                 {isPending ? <Loader className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
               </Button>
             </TooltipTrigger>
@@ -240,7 +240,7 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Download card" onClick={handleDownload}>
+              <Button variant="ghost" size="icon" aria-label="Download card" onClick={handleDownload} className="hover:bg-white/20">
                 <Download className="h-4 w-4" />
               </Button>
             </TooltipTrigger>

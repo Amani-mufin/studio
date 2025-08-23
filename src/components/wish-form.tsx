@@ -68,7 +68,7 @@ const DEFAULT_IMAGES = [
   'https://asset.cloudinary.com/sirsuccess/image/upload/v1715873243/2074ba736a35c360db8997a4d9bed277.jpg',
   'https://asset.cloudinary.com/sirsuccess/image/upload/v1715873223/64ca296c2634008ad0f107f963d04782.jpg',
   'https://asset.cloudinary.com/sirsuccess/image/upload/v1715873199/dc94b7912a264827d8145e06929d3ee4.jpg',
-  'https://i.imgur.com/8p5cW6h.jpeg',
+  'https://i.imgur.com/vWb23o7.png',
   'https://placehold.co/100x100.png',
   'https://placehold.co/100x100.png',
 ];
@@ -108,7 +108,7 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         {isEditing ? (
-          <Button variant="ghost" size="icon" aria-label="Edit card">
+          <Button variant="ghost" size="icon" aria-label="Edit card" className="hover:bg-white/20">
             <Edit className="h-4 w-4" />
           </Button>
         ) : (
