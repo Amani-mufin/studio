@@ -174,7 +174,7 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
                     <RadioGroup
                       onValueChange={field.onChange}
                       defaultValue={field.value}
-                      className="grid grid-cols-2 gap-4"
+                      className="grid grid-cols-4 gap-4"
                     >
                       {DEFAULT_IMAGES.map((url, index) => (
                         <FormItem key={url} className="flex items-center space-x-3 space-y-0">
@@ -183,9 +183,9 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
                           </FormControl>
                           <Label
                             htmlFor={`image-${index}`}
-                            className="relative flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer w-full aspect-video"
+                            className="relative flex items-center justify-center rounded-full border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer w-20 h-20 overflow-hidden"
                           >
-                            <Image src={url} alt={`Default image ${index + 1}`} layout="fill" objectFit="cover" className="rounded-sm" data-ai-hint={index < 3 ? "celebration event" : "man portrait"} />
+                            <Image src={url} alt={`Default image ${index + 1}`} layout="fill" objectFit="cover" data-ai-hint={index < 3 ? "celebration event" : "man portrait"} />
                           </Label>
                         </FormItem>
                       ))}
