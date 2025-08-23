@@ -194,12 +194,14 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
                     <FormItem>
                       <FormLabel>Card Appearance</FormLabel>
                       <FormControl>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div className="grid grid-cols-3 gap-3">
                           {[
                             { value: "bg-gradient-pink", label: "Pink" },
                             { value: "bg-gradient-blue", label: "Blue" },
                             { value: "bg-gradient-purple", label: "Purple" },
                             { value: "bg-gradient-green", label: "Green" },
+                            { value: "bg-gradient-orange", label: "Orange" },
+                            { value: "bg-gradient-teal", label: "Teal" },
                           ].map((color) => (
                             <button
                               key={color.value}
