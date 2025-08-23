@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import type { WishCardData } from '@/lib/types';
-import { format } from 'date-fns';
 
 const LOCAL_STORAGE_KEY = 'wish-weaver-board';
 
@@ -32,14 +31,20 @@ export function useWishBoard() {
     }
   }, [cards, isMounted]);
 
-  const addCard = useCallback((cardData: Omit<WishCardData, 'id' | 'createdAt' | 'position'>) => {
+  const addCard = useCallback((cardData: Omit<WishCardData, 'id' | 'createdAt' | 'position' | 'reactions'>) => {
     const newCard: WishCardData = {
-      ...cardData,
       id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
       position: {
         x: window.innerWidth / 2 - 150 + (Math.random() - 0.5) * 100,
         y: window.innerHeight / 2 - 200 + (Math.random() - 0.5) * 100,
+      },
+      ...cardData,
+      imageUrl: cardData.imageUrl || 'https://i.imgur.com/Ip7b2C1.png',
+      reactions: {
+        love: 0,
+        celebration: 0,
+        clap: 0,
       },
     };
     setCards((prev) => [...prev, newCard]);

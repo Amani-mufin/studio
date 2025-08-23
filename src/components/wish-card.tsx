@@ -49,8 +49,8 @@ export function WishCard({ card, updateCard, deleteCard, updateCardPosition }: W
     if (!cardRef.current) return;
     isDragging.current = true;
     dragStartPos.current = {
-      x: e.clientX,
-      y: e.clientY,
+      x: e.clientX - card.position.x,
+      y: e.clientY - card.position.y,
     };
     document.addEventListener('mousemove', handleDragMove);
     document.addEventListener('mouseup', handleDragEnd, { once: true });
@@ -58,28 +58,23 @@ export function WishCard({ card, updateCard, deleteCard, updateCardPosition }: W
     cardRef.current.style.zIndex = '10';
   };
 
-  const handleDragMove = (e: globalThis.MouseEvent) => {
+  const handleDragMove = useCallback((e: globalThis.MouseEvent) => {
     if (!isDragging.current || !cardRef.current) return;
-    const dx = e.clientX - dragStartPos.current.x;
-    const dy = e.clientY - dragStartPos.current.y;
-    const newX = card.position.x + dx;
-    const newY = card.position.y + dy;
+    const newX = e.clientX - dragStartPos.current.x;
+    const newY = e.clientY - dragStartPos.current.y;
     cardRef.current.style.transform = `translate(${newX}px, ${newY}px)`;
-  };
+  }, []);
 
-  const handleDragEnd = (e: globalThis.MouseEvent) => {
+  const handleDragEnd = useCallback((e: globalThis.MouseEvent) => {
     if (!isDragging.current || !cardRef.current) return;
     isDragging.current = false;
     document.removeEventListener('mousemove', handleDragMove);
     cardRef.current.style.cursor = 'grab';
     cardRef.current.style.zIndex = '1';
-    const dx = e.clientX - dragStartPos.current.x;
-    const dy = e.clientY - dragStartPos.current.y;
-    const newX = card.position.x + dx;
-    const newY = card.position.y + dy;
-    cardRef.current.style.transform = `translate(${newX}px, ${newY}px)`;
+    const newX = e.clientX - dragStartPos.current.x;
+    const newY = e.clientY - dragStartPos.current.y;
     updateCardPosition(card.id, { x: newX, y: newY });
-  };
+  }, [card.id, updateCardPosition, handleDragMove]);
 
   const generatePoem = () => {
     startTransition(async () => {
@@ -117,7 +112,7 @@ export function WishCard({ card, updateCard, deleteCard, updateCardPosition }: W
       ...card,
       reactions: {
         ...card.reactions,
-        [reactionType]: card.reactions[reactionType] + 1,
+        [reactionType]: (card.reactions[reactionType] || 0) + 1,
       },
     };
     updateCard(updatedCard);
@@ -165,9 +160,26 @@ export function WishCard({ card, updateCard, deleteCard, updateCardPosition }: W
           </div>
         )}
       </CardContent>
-      <CardFooter className="flex justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <CardFooter className="flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="flex gap-1 items-center">
+          <Button variant="ghost" size="icon" aria-label="Love" onClick={() => handleReaction('love')} className="flex items-center gap-1 px-2">
+            <Heart className="h-4 w-4" /> 
+            <span className="text-xs">{card.reactions.love || 0}</span>
+          </Button>
+          <Button variant="ghost" size="icon" aria-label="Celebrate" onClick={() => handleReaction('celebration')} className="flex items-center gap-1 px-2">
+            <PartyPopper className="h-4 w-4" />
+            <span className="text-xs">{card.reactions.celebration || 0}</span>
+          </Button>
+          <Button variant="ghost" size="icon" aria-label="Clap" onClick={() => handleReaction('clap')} className="flex items-center gap-1 px-2">
+            <Hand className="h-4 w-4" />
+            <span className="text-xs">{card.reactions.clap || 0}</span>
+          </Button>
+        </div>
         <div className="flex gap-1">
           <WishForm cardData={card} onSave={updateCard} />
+          <Button variant="ghost" size="icon" aria-label="Generate poem" onClick={generatePoem} disabled={isPending}>
+            {isPending ? <Loader className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+          </Button>
           <Button variant="ghost" size="icon" aria-label="Download card" onClick={handleDownload}>
             <Download className="h-4 w-4" />
           </Button>
@@ -182,4 +194,16 @@ export function WishCard({ card, updateCard, deleteCard, updateCardPosition }: W
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>
                   This will permanently delete this wish. This action cannot be undone.
-                </
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => deleteCard(card.id)}>Delete</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </CardFooter>
+    </Card>
+  );
+}
