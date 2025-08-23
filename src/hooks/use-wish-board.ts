@@ -7,10 +7,8 @@ const LOCAL_STORAGE_KEY = 'wish-weaver-board';
 
 export function useWishBoard() {
   const [cards, setCards] = useState<WishCardData[]>([]);
-  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
     try {
       const storedCards = window.localStorage.getItem(LOCAL_STORAGE_KEY);
       if (storedCards) {
@@ -22,19 +20,14 @@ export function useWishBoard() {
   }, []);
 
   useEffect(() => {
-    if (isMounted) {
-      try {
-        window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cards));
-      } catch (error) {
-        console.error('Failed to save cards to local storage', error);
-      }
+    try {
+      window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cards));
+    } catch (error) {
+      console.error('Failed to save cards to local storage', error);
     }
-  }, [cards, isMounted]);
+  }, [cards]);
 
   const addCard = useCallback((cardData: Omit<WishCardData, 'id' | 'createdAt' | 'position' | 'reactions'>) => {
-    // This check ensures window is only accessed on the client.
-    if (typeof window === 'undefined') return;
-
     const newCard: WishCardData = {
       id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
@@ -69,6 +62,5 @@ export function useWishBoard() {
     );
   }, []);
 
-  // Only return cards if the component is mounted on the client
-  return { cards: isMounted ? cards : [], addCard, updateCard, deleteCard, updateCardPosition };
+  return { cards, addCard, updateCard, deleteCard, updateCardPosition };
 }
