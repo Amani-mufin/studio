@@ -68,9 +68,9 @@ const FONT_OPTIONS = [
 
 const DEFAULT_IMAGES = [
   'https://i.imgur.com/Ip7b2C1.png',
-  'https://placehold.co/600x400.png',
-  'https://placehold.co/600x401.png',
-  'https://placehold.co/600x402.png',
+  'https://i.imgur.com/p5n8sD4.png',
+  'https://i.imgur.com/5lI0D43.png',
+  'https://i.imgur.com/xV6020q.png',
 ];
 
 export function WishForm({ cardData, onSave }: WishFormProps) {
