@@ -21,6 +21,12 @@ const nextConfig: NextConfig = {
         hostname: 'i.imgur.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'asset.cloudinary.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },

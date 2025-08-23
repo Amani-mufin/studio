@@ -67,9 +67,9 @@ const FONT_OPTIONS = [
 ];
 
 const DEFAULT_IMAGES = [
-  'https://i.imgur.com/Ip7b2C1.png',
-  'https://i.imgur.com/p5n8sD4.png',
-  'https://i.imgur.com/5lI0D43.png',
+  'https://asset.cloudinary.com/sirsuccess/2074ba736a35c360db8997a4d9bed277',
+  'https://asset.cloudinary.com/sirsuccess/64ca296c2634008ad0f107f963d04782',
+  'https://asset.cloudinary.com/sirsuccess/dc94b7912a264827d8145e06929d3ee4',
   'https://i.imgur.com/xV6020q.png',
 ];
 
@@ -185,7 +185,7 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
                             htmlFor={`image-${index}`}
                             className="relative flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer w-full aspect-video"
                           >
-                            <Image src={url} alt={`Default image ${index + 1}`} layout="fill" objectFit="cover" className="rounded-sm" data-ai-hint={index === 0 ? "celebration event" : "abstract background"} />
+                            <Image src={url} alt={`Default image ${index + 1}`} layout="fill" objectFit="cover" className="rounded-sm" data-ai-hint={index === 3 ? "abstract background" : "celebration event"} />
                           </Label>
                         </FormItem>
                       ))}
