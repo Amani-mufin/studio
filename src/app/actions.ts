@@ -39,10 +39,12 @@ export async function getWishes(): Promise<WishCardData[]> {
     const snapshot = await getDocs(wishesCollection);
     return snapshot.docs.map((doc) => {
       const data = doc.data();
+      // Ensure createdAt is converted to a string before returning
+      const createdAt = data.createdAt as Timestamp;
       return {
         ...data,
         id: doc.id,
-        createdAt: (data.createdAt as Timestamp).toDate().toISOString(),
+        createdAt: createdAt.toDate().toISOString(),
       } as WishCardData;
     });
   } catch (error) {
