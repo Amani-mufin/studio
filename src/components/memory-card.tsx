@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Wand2, Loader, GripVertical, Download, Heart, PartyPopper } from 'lucide-react';
+import { Wand2, Loader, GripVertical, Download, Heart, PartyPopper, Share2 } from 'lucide-react';
 import { MemoryForm } from './memory-form';
 import { getPoemAction } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
@@ -140,6 +140,41 @@ export function MemoryCard({ card, updateCard, updateCardPosition, isMobileView 
         });
     }
   }, [card.id, card.style, isMobileView]);
+
+  const handleShare = useCallback(async () => {
+    if (!cardRef.current) return;
+    
+    try {
+      const blob = await htmlToImage.toBlob(cardRef.current, {
+         filter: (node) => !node.classList?.contains('exclude-from-download'),
+      });
+
+      if (!blob) {
+        throw new Error('Failed to create image blob.');
+      }
+
+      const file = new File([blob], `memory-${card.id}.jpg`, { type: 'image/jpeg' });
+      const shareData = {
+        files: [file],
+        title: `A memory from ${card.name}`,
+        text: card.wish,
+      };
+
+      if (navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        throw new Error('Web Share API not supported in this browser.');
+      }
+    } catch (error) {
+      console.error('Sharing failed:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Sharing Failed',
+        description: 'Could not share the card. Your browser might not support this feature.',
+      });
+    }
+  }, [card.id, card.name, card.wish, toast]);
+
 
   const handleReaction = (reactionType: ReactionType) => {
     if (!currentUserId) return;
@@ -269,6 +304,16 @@ export function MemoryCard({ card, updateCard, updateCardPosition, isMobileView 
           </Tooltip>
         </div>
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 exclude-from-download">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="Share card" onClick={handleShare} className="hover:bg-white/20">
+                <Share2 className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Share</p>
+            </TooltipContent>
+          </Tooltip>
           {canEdit && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -305,5 +350,3 @@ export function MemoryCard({ card, updateCard, updateCardPosition, isMobileView 
     </TooltipProvider>
   );
 }
-
-    
