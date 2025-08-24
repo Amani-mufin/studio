@@ -167,12 +167,14 @@ export function MemoryCard({ card, updateCard, updateCardPosition, isMobileView 
   
   const backgroundStyle = card.style?.background || 'bg-gradient-pink';
 
+  const hasReactions = card.reactions.love > 0 || card.reactions.celebration > 0;
+
   return (
     <TooltipProvider>
     <Card
       ref={cardRef}
       className={cn(
-        "w-[250px] min-h-[150px] transition-all duration-300 ease-in-out group",
+        "w-[250px] min-h-[150px] transition-all duration-300 ease-in-out group flex flex-col justify-between",
         isMobileView ? "relative w-full max-w-sm" : "absolute hover:animate-shake",
       )}
       style={{
@@ -185,61 +187,63 @@ export function MemoryCard({ card, updateCard, updateCardPosition, isMobileView 
       }}
       data-background-class={!backgroundStyle.startsWith('#') ? backgroundStyle : ''}
     >
-      <CardHeader>
-        <CardTitle className="flex justify-between items-start">
-          <span>{card.name}</span>
-            {!isMobileView && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 cursor-grab group-hover:opacity-100 opacity-0 transition-opacity hover:bg-white/20"
-                    onMouseDown={handleDragStart}
-                    aria-label="Drag card"
-                  >
-                    <GripVertical className="h-5 w-5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Drag</p>
-                </TooltipContent>
-              </Tooltip>
-            )}
-        </CardTitle>
-        <CardDescription style={{ color: card.style.textColor, opacity: 0.8 }}>
-          {format(new Date(card.createdAt), "PPP, p")}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {card.imageUrl && (
-          <div className="relative h-40 mb-4 rounded-md overflow-hidden">
-            <Image src={card.imageUrl} alt={card.name} layout="fill" objectFit="cover" objectPosition="top" data-ai-hint="celebration event" />
-          </div>
-        )}
-        <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
-          <p ref={wishTextRef} className={cn("whitespace-pre-wrap", !isExpanded && "line-clamp-1")}>
-            {card.wish}
-          </p>
-          <CollapsibleContent>
-            {card.poem && (
-              <div className="mt-4 p-3 border-l-4 border-primary/50 italic bg-white/10 rounded-r-md">
-                <p className="whitespace-pre-wrap text-sm">{card.poem}</p>
-              </div>
-            )}
-          </CollapsibleContent>
-          {showReadMore && (
-            <CollapsibleTrigger asChild>
-              <Button variant="link" className="p-0 h-auto text-xs mt-2" style={{color: card.style.textColor}}>
-                {isExpanded ? 'Read less' : 'Read more'}
-              </Button>
-            </CollapsibleTrigger>
+      <div>
+        <CardHeader>
+          <CardTitle className="flex justify-between items-start">
+            <span>{card.name}</span>
+              {!isMobileView && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 cursor-grab group-hover:opacity-100 opacity-0 transition-opacity hover:bg-white/20 exclude-from-download"
+                      onMouseDown={handleDragStart}
+                      aria-label="Drag card"
+                    >
+                      <GripVertical className="h-5 w-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Drag</p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+          </CardTitle>
+          <CardDescription style={{ color: card.style.textColor, opacity: 0.8 }}>
+            {format(new Date(card.createdAt), "PPP, p")}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {card.imageUrl && (
+            <div className="relative h-40 mb-4 rounded-md overflow-hidden">
+              <Image src={card.imageUrl} alt={card.name} layout="fill" objectFit="cover" objectPosition="top" data-ai-hint="celebration event" />
+            </div>
           )}
-        </Collapsible>
-      </CardContent>
-      <CardFooter className="flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 exclude-from-download">
-        <div className="flex gap-1 items-center">
-          <Tooltip>
+          <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+            <p ref={wishTextRef} className={cn("whitespace-pre-wrap", !isExpanded && "line-clamp-1")}>
+              {card.wish}
+            </p>
+            <CollapsibleContent>
+              {card.poem && (
+                <div className="mt-4 p-3 border-l-4 border-primary/50 italic bg-white/10 rounded-r-md">
+                  <p className="whitespace-pre-wrap text-sm">{card.poem}</p>
+                </div>
+              )}
+            </CollapsibleContent>
+            {showReadMore && (
+              <CollapsibleTrigger asChild>
+                <Button variant="link" className="p-0 h-auto text-xs mt-2" style={{color: card.style.textColor}}>
+                  {isExpanded ? 'Read less' : 'Read more'}
+                </Button>
+              </CollapsibleTrigger>
+            )}
+          </Collapsible>
+        </CardContent>
+      </div>
+      <CardFooter className="flex justify-between items-center pt-2">
+        <div className={cn("flex gap-1 items-center transition-opacity duration-300", !hasReactions && "opacity-0 group-hover:opacity-100")}>
+           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="icon" aria-label="Love" onClick={() => handleReaction('love')} className="flex items-center gap-1 px-2 hover:bg-white/20">
                 <Heart className="h-4 w-4" /> 
@@ -262,7 +266,7 @@ export function MemoryCard({ card, updateCard, updateCardPosition, isMobileView 
             </TooltipContent>
           </Tooltip>
         </div>
-        <div className="flex gap-1">
+        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 exclude-from-download">
           {canEdit && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -299,3 +303,5 @@ export function MemoryCard({ card, updateCard, updateCardPosition, isMobileView 
     </TooltipProvider>
   );
 }
+
+    
