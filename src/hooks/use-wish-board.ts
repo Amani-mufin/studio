@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useTransition } from 'react';
 import type { WishCardData } from '@/lib/types';
 import {
   getWishes,
@@ -14,26 +14,27 @@ export function useWishBoard() {
   const [cards, setCards] = useState<WishCardData[]>([]);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
+  
+  const loadWishes = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const fetchedWishes = await getWishes();
+      setCards(fetchedWishes);
+    } catch (error) {
+      console.error("Failed to load wishes:", error);
+      toast({
+        variant: 'destructive',
+        title: 'Error Loading Wishes',
+        description: 'Could not retrieve wishes from the database.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [toast]);
 
   useEffect(() => {
-    async function loadWishes() {
-      setIsLoading(true);
-      try {
-        const fetchedWishes = await getWishes();
-        setCards(fetchedWishes);
-      } catch (error) {
-        console.error("Failed to load wishes:", error);
-        toast({
-          variant: 'destructive',
-          title: 'Error Loading Wishes',
-          description: 'Could not retrieve wishes from the database.',
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    }
     loadWishes();
-  }, [toast]);
+  }, [loadWishes]);
 
   const addCard = useCallback(
     async (
@@ -69,6 +70,7 @@ export function useWishBoard() {
         });
         setCards((prev) => prev.filter((card) => card.id !== tempId));
       } else {
+        // Replace temp card with the real one from the server
         setCards((prev) =>
           prev.map((card) => (card.id === tempId ? result : card))
         );
@@ -79,6 +81,7 @@ export function useWishBoard() {
 
   const updateCard = useCallback(
     async (updatedCard: WishCardData) => {
+      const originalCards = cards;
       setCards((prev) =>
         prev.map((card) => (card.id === updatedCard.id ? updatedCard : card))
       );
@@ -91,27 +94,36 @@ export function useWishBoard() {
           title: 'Error',
           description: result.error,
         });
-        // You might want to revert the state here if the update fails
+        // Revert to original state on failure
+        setCards(originalCards);
       }
     },
-    [toast]
+    [toast, cards]
   );
 
   const updateCardPosition = useCallback(
     async (id: string, position: { x: number; y: number }) => {
+       // Optimistically update the position in the UI
       setCards((prev) =>
         prev.map((card) => (card.id === id ? { ...card, position } : card))
       );
       
-      const result = await updateWishPositionAction(id, position);
+      // Debounce the database update to avoid excessive writes during drag
+      const timer = setTimeout(async () => {
+         const result = await updateWishPositionAction(id, position);
       
-      if (result.error) {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: result.error,
-        });
-      }
+        if (result.error) {
+          toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: result.error,
+          });
+          // Note: We don't revert position on failure to avoid UI jumps.
+          // The next successful fetch will correct it.
+        }
+      }, 500); // 500ms debounce
+
+      return () => clearTimeout(timer);
     },
     [toast]
   );
