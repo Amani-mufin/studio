@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useTransition } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { WishCardData } from '@/lib/types';
 import {
   getWishes,
@@ -13,13 +13,16 @@ import { useToast } from './use-toast';
 export function useWishBoard() {
   const [cards, setCards] = useState<WishCardData[]>([]);
   const { toast } = useToast();
-  const [isLoading, startTransition] = useTransition();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    startTransition(async () => {
+    const fetchWishes = async () => {
+      setIsLoading(true);
       const fetchedWishes = await getWishes();
       setCards(fetchedWishes);
-    });
+      setIsLoading(false);
+    };
+    fetchWishes();
   }, []);
 
   const addCard = useCallback(
