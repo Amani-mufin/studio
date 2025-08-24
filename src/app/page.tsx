@@ -1,3 +1,4 @@
+
 'use client';
 import { MemoryBoard } from '@/components/memory-board';
 import { Header } from '@/components/header';
@@ -5,7 +6,7 @@ import { useMemoryBoard } from '@/hooks/use-memory-board';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function Home() {
-  const { cards, addCard, updateCard, updateCardPosition, isLoading } = useMemoryBoard();
+  const { cards, addCard, updateCard, updateCardPosition, isLoading, userId } = useMemoryBoard();
 
   return (
     <main className="relative h-screen w-screen overflow-auto bg-background font-body">
@@ -21,6 +22,7 @@ export default function Home() {
           cards={cards}
           updateCard={updateCard}
           updateCardPosition={updateCardPosition}
+          currentUserId={userId}
         />
       )}
     </main>

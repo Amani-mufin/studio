@@ -1,3 +1,4 @@
+
 import { MemoryCard } from './memory-card';
 import type { MemoryCardData } from '@/lib/types';
 
@@ -5,9 +6,10 @@ interface MemoryBoardProps {
   cards: MemoryCardData[];
   updateCard: (card: MemoryCardData) => void;
   updateCardPosition: (id: string, position: { x: number; y: number }) => void;
+  currentUserId: string | null;
 }
 
-export function MemoryBoard({ cards, updateCard, updateCardPosition }: MemoryBoardProps) {
+export function MemoryBoard({ cards, updateCard, updateCardPosition, currentUserId }: MemoryBoardProps) {
   return (
     <div className="absolute inset-0 h-full w-full pt-20 sm:pt-0">
       {/* Mobile Layout: Single column */}
@@ -19,6 +21,7 @@ export function MemoryBoard({ cards, updateCard, updateCardPosition }: MemoryBoa
             updateCard={updateCard}
             updateCardPosition={updateCardPosition}
             isMobileView={true}
+            currentUserId={currentUserId}
           />
         ))}
       </div>
@@ -32,6 +35,7 @@ export function MemoryBoard({ cards, updateCard, updateCardPosition }: MemoryBoa
             updateCard={updateCard}
             updateCardPosition={updateCardPosition}
             isMobileView={false}
+            currentUserId={currentUserId}
           />
         ))}
       </div>

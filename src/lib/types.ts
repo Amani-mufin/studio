@@ -1,3 +1,4 @@
+
 export type ReactionType = 'love' | 'celebration';
 
 export interface MemoryCardData {
@@ -5,6 +6,7 @@ export interface MemoryCardData {
   wish: string;
   name: string;
   createdAt: string;
+  userId: string; // ID of the user who created the card
   imageUrl?: string;
   poem?: string;
   position: {
@@ -19,5 +21,9 @@ export interface MemoryCardData {
   reactions: {
     love: number;
     celebration: number;
+  };
+  reactedUserIds?: {
+    love: string[];
+    celebration: string[];
   };
 }

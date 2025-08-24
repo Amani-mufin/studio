@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { MemoryCardData, ReactionType } from '@/lib/types';
@@ -28,9 +29,10 @@ interface MemoryCardProps {
   updateCard: (card: MemoryCardData) => void;
   updateCardPosition: (id: string, position: { x: number; y: number }) => void;
   isMobileView?: boolean;
+  currentUserId: string | null;
 }
 
-export function MemoryCard({ card, updateCard, updateCardPosition, isMobileView = false }: MemoryCardProps) {
+export function MemoryCard({ card, updateCard, updateCardPosition, isMobileView = false, currentUserId }: MemoryCardProps) {
   const { toast } = useToast();
   const [isPoemPending, startPoemTransition] = useTransition();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -40,13 +42,14 @@ export function MemoryCard({ card, updateCard, updateCardPosition, isMobileView 
   const dragStartPos = useRef({ x: 0, y: 0 });
   const isDragging = useRef(false);
 
+  const canEdit = currentUserId === card.userId;
+  
   useEffect(() => {
     if (card.poem) {
       setShowReadMore(true);
       return;
     }
     if (wishTextRef.current) {
-      // Show if text is truncated (overflows one line)
       const isOverflowing = wishTextRef.current.scrollHeight > wishTextRef.current.clientHeight;
       setShowReadMore(isOverflowing);
     }
@@ -117,7 +120,6 @@ export function MemoryCard({ card, updateCard, updateCardPosition, isMobileView 
           fontFamily: card.style.fontFamily,
         },
         filter: (node) => {
-          // Exclude the node if it has the 'exclude-from-download' class
           return !node.classList?.contains('exclude-from-download');
         },
       }).then((dataUrl) => {
@@ -138,11 +140,26 @@ export function MemoryCard({ card, updateCard, updateCardPosition, isMobileView 
   }, [card.id, card.style, isMobileView]);
 
   const handleReaction = (reactionType: ReactionType) => {
+    if (!currentUserId) return;
+
+    const reactedUsers = card.reactedUserIds?.[reactionType] || [];
+    if (reactedUsers.includes(currentUserId)) {
+        toast({
+            title: "You've already reacted",
+            description: `You can only ${reactionType} once.`,
+        });
+        return;
+    }
+
     const updatedCard = {
       ...card,
       reactions: {
         ...card.reactions,
         [reactionType]: (card.reactions[reactionType] || 0) + 1,
+      },
+      reactedUserIds: {
+        ...(card.reactedUserIds || { love: [], celebration: [] }),
+        [reactionType]: [...reactedUsers, currentUserId],
       },
     };
     updateCard(updatedCard);
@@ -246,14 +263,16 @@ export function MemoryCard({ card, updateCard, updateCardPosition, isMobileView 
           </Tooltip>
         </div>
         <div className="flex gap-1">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <MemoryForm cardData={card} onSave={updateCard} />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Edit</p>
-            </TooltipContent>
-          </Tooltip>
+          {canEdit && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <MemoryForm cardData={card} onSave={updateCard} />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Edit</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="icon" aria-label="Generate poem" onClick={generatePoem} disabled={isPoemPending} className="hover:bg-white/20">

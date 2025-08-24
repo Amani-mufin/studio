@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState, useEffect, useCallback, useTransition } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { MemoryCardData } from '@/lib/types';
 import {
   getMemories,
@@ -9,11 +10,13 @@ import {
   updateMemoryPosition as updateMemoryPositionAction,
 } from '@/app/actions';
 import { useToast } from './use-toast';
+import { useUserId } from './use-user-id';
 
 export function useMemoryBoard() {
   const [cards, setCards] = useState<MemoryCardData[]>([]);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
+  const userId = useUserId();
   
   const loadMemories = useCallback(async () => {
     setIsLoading(true);
@@ -38,18 +41,27 @@ export function useMemoryBoard() {
 
   const addCard = useCallback(
     async (
-      cardData: Omit<MemoryCardData, 'id' | 'createdAt' | 'position' | 'reactions'>
+      cardData: Omit<MemoryCardData, 'id' | 'createdAt' | 'position' | 'reactions' | 'userId'>
     ) => {
+      if (!userId) {
+        toast({ variant: 'destructive', title: 'Error', description: 'User ID not found. Cannot create card.' });
+        return;
+      }
       const newCardData: Omit<MemoryCardData, 'id' | 'createdAt'> = {
         position: {
           x: Math.random() * (window.innerWidth - 350),
           y: 100 + Math.random() * (window.innerHeight - 450),
         },
         ...cardData,
+        userId: userId,
         reactions: {
           love: 0,
           celebration: 0,
         },
+        reactedUserIds: {
+          love: [],
+          celebration: [],
+        }
       };
 
       const tempId = `temp-${Date.now()}`;
@@ -70,13 +82,12 @@ export function useMemoryBoard() {
         });
         setCards((prev) => prev.filter((card) => card.id !== tempId));
       } else {
-        // Replace temp card with the real one from the server
         setCards((prev) =>
           prev.map((card) => (card.id === tempId ? result : card))
         );
       }
     },
-    [toast]
+    [toast, userId]
   );
 
   const updateCard = useCallback(
@@ -94,7 +105,6 @@ export function useMemoryBoard() {
           title: 'Error',
           description: result.error,
         });
-        // Revert to original state on failure
         setCards(originalCards);
       }
     },
@@ -103,12 +113,10 @@ export function useMemoryBoard() {
 
   const updateCardPosition = useCallback(
     async (id: string, position: { x: number; y: number }) => {
-       // Optimistically update the position in the UI
       setCards((prev) =>
         prev.map((card) => (card.id === id ? { ...card, position } : card))
       );
       
-      // Debounce the database update to avoid excessive writes during drag
       const timer = setTimeout(async () => {
          const result = await updateMemoryPositionAction(id, position);
       
@@ -118,15 +126,13 @@ export function useMemoryBoard() {
             title: 'Error',
             description: result.error,
           });
-          // Note: We don't revert position on failure to avoid UI jumps.
-          // The next successful fetch will correct it.
         }
-      }, 500); // 500ms debounce
+      }, 500);
 
       return () => clearTimeout(timer);
     },
     [toast]
   );
 
-  return { cards, addCard, updateCard, updateCardPosition, isLoading };
+  return { cards, addCard, updateCard, updateCardPosition, isLoading, userId };
 }
