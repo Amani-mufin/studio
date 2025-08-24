@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Wand2, Loader, GripVertical, Download, Heart, PartyPopper, Share2 } from 'lucide-react';
+import { Wand2, Loader, GripVertical, Download, Heart, PartyPopper, Share2, Mail, Phone, MessageCircle } from 'lucide-react';
 import { MemoryForm } from './memory-form';
 import { getPoemAction } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
@@ -276,6 +276,26 @@ export function MemoryCard({ card, updateCard, updateCardPosition, isMobileView 
               </CollapsibleTrigger>
             )}
           </Collapsible>
+          <div className="mt-4 space-y-2 text-xs opacity-80">
+            {card.email && (
+              <div className="flex items-center gap-2">
+                <Mail className="h-3 w-3" />
+                <a href={`mailto:${card.email}`} className="hover:underline">{card.email}</a>
+              </div>
+            )}
+            {card.phone && (
+              <div className="flex items-center gap-2">
+                <Phone className="h-3 w-3" />
+                <a href={`tel:${card.phone}`} className="hover:underline">{card.phone}</a>
+              </div>
+            )}
+            {card.whatsapp && (
+              <div className="flex items-center gap-2">
+                <MessageCircle className="h-3 w-3" />
+                <a href={`https://wa.me/${card.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{card.whatsapp}</a>
+              </div>
+            )}
+          </div>
         </CardContent>
       </div>
       <CardFooter className="flex justify-between items-center pt-2">

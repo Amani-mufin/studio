@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -42,6 +43,9 @@ const formSchema = z.object({
   wish: z.string().min(1, 'A memory is required.'),
   name: z.string().min(1, 'Your name is required.'),
   imageUrl: z.string().optional(),
+  email: z.string().email('Invalid email address.').optional().or(z.literal('')),
+  phone: z.string().optional(),
+  whatsapp: z.string().optional(),
   style: z.object({
     background: z.string(),
     textColor: z.string(),
@@ -81,6 +85,9 @@ export function MemoryForm({ cardData, onSave }: MemoryFormProps) {
     wish: cardData?.wish ?? '',
     name: cardData?.name ?? '',
     imageUrl: cardData?.imageUrl ?? DEFAULT_IMAGES[0],
+    email: cardData?.email ?? '',
+    phone: cardData?.phone ?? '',
+    whatsapp: cardData?.whatsapp ?? '',
     style: cardData?.style ?? {
       background: 'bg-gradient-blue',
       textColor: '#ffffff',
@@ -152,11 +159,54 @@ export function MemoryForm({ cardData, onSave }: MemoryFormProps) {
               )}
             />
             
+            <div className="space-y-4 pt-4 border-t">
+              <h3 className="text-base font-medium">Contact (Optional)</h3>
+               <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="you@example.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl>
+                        <Input placeholder="+1 234 567 890" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="whatsapp"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>WhatsApp Number</FormLabel>
+                      <FormControl>
+                        <Input placeholder="+1 234 567 890" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+            </div>
+
             <FormField
               control={form.control}
               name="imageUrl"
               render={({ field }) => (
-                <FormItem className="space-y-3">
+                <FormItem className="space-y-3 pt-4 border-t">
                   <FormLabel>Choose a photo for your wish card</FormLabel>
                   <FormControl>
                     <RadioGroup

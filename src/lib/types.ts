@@ -9,6 +9,9 @@ export interface MemoryCardData {
   userId: string; // ID of the user who created the card
   imageUrl?: string;
   poem?: string;
+  email?: string;
+  whatsapp?: string;
+  phone?: string;
   position: {
     x: number;
     y: number;
