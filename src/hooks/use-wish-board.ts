@@ -13,7 +13,7 @@ import { useToast } from './use-toast';
 export function useWishBoard() {
   const [cards, setCards] = useState<WishCardData[]>([]);
   const { toast } = useToast();
-  const [isPending, startTransition] = useTransition();
+  const [isLoading, startTransition] = useTransition();
 
   useEffect(() => {
     startTransition(async () => {
@@ -33,7 +33,6 @@ export function useWishBoard() {
           y: 100 + Math.random() * (window.innerHeight - 450),
         },
         ...cardData,
-        imageUrl: cardData.imageUrl || 'https://i.imgur.com/Ip7b2C1.png',
         reactions: {
           love: 0,
           celebration: 0,
@@ -112,5 +111,5 @@ export function useWishBoard() {
     [toast]
   );
 
-  return { cards, addCard, updateCard, updateCardPosition, isLoading: isPending };
+  return { cards, addCard, updateCard, updateCardPosition, isLoading };
 }

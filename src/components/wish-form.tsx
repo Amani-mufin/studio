@@ -65,12 +65,12 @@ const FONT_OPTIONS = [
 ];
 
 const DEFAULT_IMAGES = [
-  'https://asset.cloudinary.com/sirsuccess/image/upload/v1715873243/2074ba736a35c360db8997a4d9bed277.jpg',
-  'https://asset.cloudinary.com/sirsuccess/image/upload/v1715873223/64ca296c2634008ad0f107f963d04782.jpg',
-  'https://asset.cloudinary.com/sirsuccess/image/upload/v1715873199/dc94b7912a264827d8145e06929d3ee4.jpg',
-  'https://i.imgur.com/vWb23o7.png',
-  'https://placehold.co/100x100.png',
-  'https://placehold.co/100x100.png',
+  'https://res.cloudinary.com/sirsuccess/image/upload/v1755979859/IMG-20250616-WA0039_1_u9c4ta.jpg',
+  'https://res.cloudinary.com/sirsuccess/image/upload/v1755992720/DSC_1520e_1_xzvgrs.jpg',
+  'https://res.cloudinary.com/sirsuccess/image/upload/v1755992335/DSC_1409e_1_1_cpt7f6.jpg',
+  'https://res.cloudinary.com/sirsuccess/image/upload/v1755979924/DSC_1446e_azwxc6.jpg',
+  'https://res.cloudinary.com/sirsuccess/image/upload/v1755992334/DSC_1457e_1_ietwur.jpg',
+  'https://res.cloudinary.com/sirsuccess/image/upload/v1755979924/DSC_1433e_vdsk1v.jpg',
 ];
 
 export function WishForm({ cardData, onSave }: WishFormProps) {
