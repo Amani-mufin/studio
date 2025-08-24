@@ -43,6 +43,8 @@ export function MemoryCard({ card, updateCard, updateCardPosition, isMobileView 
   const isDragging = useRef(false);
 
   const canEdit = currentUserId === card.userId;
+  const hasLoved = currentUserId ? card.reactedUserIds?.love?.includes(currentUserId) : false;
+  const hasCelebrated = currentUserId ? card.reactedUserIds?.celebration?.includes(currentUserId) : false;
   
   useEffect(() => {
     if (card.poem) {
@@ -246,7 +248,7 @@ export function MemoryCard({ card, updateCard, updateCardPosition, isMobileView 
            <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="icon" aria-label="Love" onClick={() => handleReaction('love')} className="flex items-center gap-1 px-2 hover:bg-white/20">
-                <Heart className="h-4 w-4" /> 
+                <Heart className={cn("h-4 w-4", hasLoved && "fill-pink-500 text-pink-500")} /> 
                 <span className="text-xs">{card.reactions.love || 0}</span>
               </Button>
             </TooltipTrigger>
@@ -257,7 +259,7 @@ export function MemoryCard({ card, updateCard, updateCardPosition, isMobileView 
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="icon" aria-label="Celebrate" onClick={() => handleReaction('celebration')} className="flex items-center gap-1 px-2 hover:bg-white/20">
-                <PartyPopper className="h-4 w-4" />
+                <PartyPopper className={cn("h-4 w-4", hasCelebrated && "fill-yellow-500 text-yellow-500")} />
                 <span className="text-xs">{card.reactions.celebration || 0}</span>
               </Button>
             </TooltipTrigger>
