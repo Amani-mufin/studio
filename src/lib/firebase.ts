@@ -3,13 +3,13 @@ import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  projectId: "wish-weaver-nup7u",
-  appId: "1:508748030131:web:6f729785be79a3a02dd0c6",
-  storageBucket: "wish-weaver-nup7u.firebasestorage.app",
-  apiKey: "AIzaSyDq9fJuYVLNYFevrQxWjLIhnmgthKQSY9U",
-  authDomain: "wish-weaver-nup7u.firebaseapp.com",
-  measurementId: "",
-  messagingSenderId: "508748030131"
+  apiKey: "AIzaSyAeiefcaHzTnEzGjADVJyJX71bwj1N8vGM",
+  authDomain: "memory-app-e51a4.firebaseapp.com",
+  projectId: "memory-app-e51a4",
+  storageBucket: "memory-app-e51a4.firebasestorage.app",
+  messagingSenderId: "216678846115",
+  appId: "1:216678846115:web:85a3e8c05fd9bdfcc97916",
+  measurementId: "G-BH3M8EWB7P"
 };
 
 
