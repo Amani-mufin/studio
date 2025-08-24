@@ -5,7 +5,7 @@ import type { WishCardData } from '@/lib/types';
 import {
   getWishes,
   addWish,
-  updateWish,
+  updateWish as updateWishAction,
   updateWishPosition as updateWishPositionAction,
 } from '@/app/actions';
 import { useToast } from './use-toast';
@@ -16,20 +16,29 @@ export function useWishBoard() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchWishes = async () => {
+    async function loadWishes() {
       setIsLoading(true);
-      const fetchedWishes = await getWishes();
-      setCards(fetchedWishes);
-      setIsLoading(false);
-    };
-    fetchWishes();
-  }, []);
+      try {
+        const fetchedWishes = await getWishes();
+        setCards(fetchedWishes);
+      } catch (error) {
+        console.error("Failed to load wishes:", error);
+        toast({
+          variant: 'destructive',
+          title: 'Error Loading Wishes',
+          description: 'Could not retrieve wishes from the database.',
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadWishes();
+  }, [toast]);
 
   const addCard = useCallback(
     async (
       cardData: Omit<WishCardData, 'id' | 'createdAt' | 'position' | 'reactions'>
     ) => {
-      // This function is only called on the client after user interaction, so window is safe.
       const newCardData: Omit<WishCardData, 'id' | 'createdAt'> = {
         position: {
           x: Math.random() * (window.innerWidth - 350),
@@ -42,14 +51,13 @@ export function useWishBoard() {
         },
       };
 
-      // Optimistic update
       const tempId = `temp-${Date.now()}`;
       const optimisticCard: WishCardData = {
         ...newCardData,
         id: tempId,
         createdAt: new Date().toISOString(),
       };
-      setCards((prev) => [...prev, optimisticCard]);
+      setCards((prev) => [optimisticCard, ...prev]);
 
       const result = await addWish(newCardData);
       
@@ -59,10 +67,8 @@ export function useWishBoard() {
           title: 'Error',
           description: result.error,
         });
-        // Revert optimistic update
         setCards((prev) => prev.filter((card) => card.id !== tempId));
       } else {
-        // Replace optimistic card with real one from server
         setCards((prev) =>
           prev.map((card) => (card.id === tempId ? result : card))
         );
@@ -73,12 +79,11 @@ export function useWishBoard() {
 
   const updateCard = useCallback(
     async (updatedCard: WishCardData) => {
-      // Optimistic update
       setCards((prev) =>
         prev.map((card) => (card.id === updatedCard.id ? updatedCard : card))
       );
-      const { id, ...dataToUpdate } = updatedCard;
-      const result = await updateWish(id, dataToUpdate);
+      const { id, createdAt, ...dataToUpdate } = updatedCard;
+      const result = await updateWishAction(id, dataToUpdate);
 
       if (result.error) {
         toast({
@@ -86,8 +91,7 @@ export function useWishBoard() {
           title: 'Error',
           description: result.error,
         });
-        // Ideally, you'd revert the state here, but that's more complex.
-        // For now, we just show an error.
+        // You might want to revert the state here if the update fails
       }
     },
     [toast]
@@ -95,7 +99,6 @@ export function useWishBoard() {
 
   const updateCardPosition = useCallback(
     async (id: string, position: { x: number; y: number }) => {
-      // Optimistic update
       setCards((prev) =>
         prev.map((card) => (card.id === id ? { ...card, position } : card))
       );
@@ -108,7 +111,6 @@ export function useWishBoard() {
           title: 'Error',
           description: result.error,
         });
-        // Revert could be implemented here as well.
       }
     },
     [toast]
