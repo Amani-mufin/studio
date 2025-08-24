@@ -4,13 +4,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { MemoryCardData } from '@/lib/types';
 import {
-  getMemories,
   addMemory,
   updateMemory as updateMemoryAction,
   updateMemoryPosition as updateMemoryPositionAction,
 } from '@/app/actions';
 import { useToast } from './use-toast';
 import { useUserId } from './use-user-id';
+import { collection, onSnapshot, query, orderBy, Timestamp } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export function useMemoryBoard() {
   const [cards, setCards] = useState<MemoryCardData[]>([]);
@@ -18,26 +19,40 @@ export function useMemoryBoard() {
   const [isLoading, setIsLoading] = useState(true);
   const userId = useUserId();
   
-  const loadMemories = useCallback(async () => {
+  useEffect(() => {
     setIsLoading(true);
-    try {
-      const fetchedMemories = await getMemories();
-      setCards(fetchedMemories);
-    } catch (error) {
-      console.error("Failed to load memories:", error);
-      toast({
-        variant: 'destructive',
-        title: 'Error Loading Memories',
-        description: 'Could not retrieve memories from the database.',
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    const memoriesCollection = collection(db, 'memories');
+    const q = query(memoriesCollection, orderBy('createdAt', 'desc'));
+
+    const unsubscribe = onSnapshot(q, 
+      (snapshot) => {
+        const fetchedMemories = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const createdAt = data.createdAt as Timestamp;
+          return {
+            ...data,
+            id: doc.id,
+            createdAt: createdAt ? createdAt.toDate().toISOString() : new Date().toISOString(),
+          } as MemoryCardData;
+        });
+        setCards(fetchedMemories);
+        setIsLoading(false);
+      },
+      (error) => {
+        console.error("Failed to subscribe to memories:", error);
+        toast({
+          variant: 'destructive',
+          title: 'Error Loading Memories',
+          description: 'Could not retrieve memories in real-time.',
+        });
+        setIsLoading(false);
+      }
+    );
+
+    // Cleanup subscription on component unmount
+    return () => unsubscribe();
   }, [toast]);
 
-  useEffect(() => {
-    loadMemories();
-  }, [loadMemories]);
 
   const addCard = useCallback(
     async (
@@ -64,14 +79,7 @@ export function useMemoryBoard() {
         }
       };
 
-      const tempId = `temp-${Date.now()}`;
-      const optimisticCard: MemoryCardData = {
-        ...newCardData,
-        id: tempId,
-        createdAt: new Date().toISOString(),
-      };
-      setCards((prev) => [optimisticCard, ...prev]);
-
+      // No optimistic update needed, as Firestore real-time listener will handle it.
       const result = await addMemory(newCardData);
       
       if ('error' in result) {
@@ -80,11 +88,6 @@ export function useMemoryBoard() {
           title: 'Error',
           description: result.error,
         });
-        setCards((prev) => prev.filter((card) => card.id !== tempId));
-      } else {
-        setCards((prev) =>
-          prev.map((card) => (card.id === tempId ? result : card))
-        );
       }
     },
     [toast, userId]
@@ -92,6 +95,7 @@ export function useMemoryBoard() {
 
   const updateCard = useCallback(
     async (updatedCard: MemoryCardData) => {
+      // Optimistic update is no longer strictly necessary but can make the UI feel faster.
       const originalCards = cards;
       setCards((prev) =>
         prev.map((card) => (card.id === updatedCard.id ? updatedCard : card))
@@ -105,6 +109,7 @@ export function useMemoryBoard() {
           title: 'Error',
           description: result.error,
         });
+        // Revert on error
         setCards(originalCards);
       }
     },
@@ -126,6 +131,8 @@ export function useMemoryBoard() {
             title: 'Error',
             description: result.error,
           });
+          // Note: Reverting position on error can be jarring, so we might leave it.
+          // The real-time listener would eventually correct it anyway.
         }
       }, 500);
 

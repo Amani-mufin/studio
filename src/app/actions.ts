@@ -4,14 +4,11 @@ import { db } from '@/lib/firebase';
 import type { MemoryCardData } from '@/lib/types';
 import {
   collection,
-  getDocs,
   addDoc,
   updateDoc,
   doc,
   serverTimestamp,
   Timestamp,
-  orderBy,
-  query,
   getDoc,
 } from 'firebase/firestore';
 import { getPoemAction as getPoemFromAi } from '@/ai/flows/generate-poem-for-wish';
@@ -23,51 +20,17 @@ export const getPoemAction = getPoemFromAi;
 
 const memoriesCollection = collection(db, 'memories');
 
-export async function getMemories(): Promise<MemoryCardData[]> {
-  try {
-    const q = query(memoriesCollection, orderBy('createdAt', 'desc'));
-    const snapshot = await getDocs(q);
-    
-    if (snapshot.empty) {
-      console.log('No memories found in Firestore.');
-      return [];
-    }
-
-    return snapshot.docs.map((doc) => {
-      const data = doc.data();
-      // When data is fetched from Firestore, createdAt is a Timestamp object.
-      // It needs to be converted to a serializable format (like an ISO string)
-      // before being sent to the client component.
-      const createdAt = data.createdAt as Timestamp;
-      return {
-        ...data,
-        id: doc.id,
-        // Convert Timestamp to ISO string. Handle cases where it might be null.
-        createdAt: createdAt ? createdAt.toDate().toISOString() : new Date().toISOString(),
-      } as MemoryCardData;
-    });
-  } catch (error) {
-    console.error('Error fetching memories from Firestore:', error);
-    // In case of an error, return an empty array to prevent the app from crashing.
-    return [];
-  }
-}
-
 export async function addMemory(
   memoryData: Omit<MemoryCardData, 'id' | 'createdAt'>
 ): Promise<MemoryCardData | { error: string }> {
   try {
-    // The data to be added to Firestore.
-    // We include `createdAt: serverTimestamp()` to let Firestore generate the timestamp.
     const docData = {
       ...memoryData,
       createdAt: serverTimestamp(),
     };
     
-    // Add the document to the 'memories' collection.
     const docRef = await addDoc(memoriesCollection, docData);
 
-    // Fetch the newly created document from Firestore to get the generated ID and timestamp.
     const newDocSnapshot = await getDoc(docRef);
     
     if (!newDocSnapshot.exists()) {
@@ -77,9 +40,8 @@ export async function addMemory(
     const newMemoryData = newDocSnapshot.data();
     const createdAtTimestamp = newMemoryData.createdAt as Timestamp;
 
-    // Construct the final MemoryCardData object with the server-generated values.
     const newMemory: MemoryCardData = {
-      ...(newMemoryData as Omit<MemoryCardData, 'id' | 'createdAt'>), // Cast the data to the correct type
+      ...(newMemoryData as Omit<MemoryCardData, 'id' | 'createdAt'>),
       id: docRef.id,
       createdAt: createdAtTimestamp.toDate().toISOString(),
     };
