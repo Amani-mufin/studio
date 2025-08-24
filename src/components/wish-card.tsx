@@ -27,9 +27,10 @@ interface WishCardProps {
   card: WishCardData;
   updateCard: (card: WishCardData) => void;
   updateCardPosition: (id: string, position: { x: number; y: number }) => void;
+  isMobileView?: boolean;
 }
 
-export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps) {
+export function WishCard({ card, updateCard, updateCardPosition, isMobileView = false }: WishCardProps) {
   const { toast } = useToast();
   const [isPoemPending, startPoemTransition] = useTransition();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -52,7 +53,7 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
   }, [card.poem, card.wish]);
 
   const handleDragStart = (e: MouseEvent<HTMLButtonElement>) => {
-    if (!cardRef.current) return;
+    if (isMobileView || !cardRef.current) return;
     isDragging.current = true;
     dragStartPos.current = {
       x: e.clientX - card.position.x,
@@ -103,13 +104,14 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
 
   const handleDownload = useCallback(() => {
     if (cardRef.current) {
-       // Temporarily remove transform for capture
       const originalTransform = cardRef.current.style.transform;
-      cardRef.current.style.transform = '';
-
+      if (!isMobileView) {
+        cardRef.current.style.transform = '';
+      }
+      
       htmlToImage.toJpeg(cardRef.current, { 
         quality: 0.95,
-        backgroundColor: '#1e1e1e', // Fallback background color
+        backgroundColor: card.style.background.startsWith('#') ? card.style.background : '#1e1e1e',
         style: {
           color: card.style.textColor,
           fontFamily: card.style.fontFamily,
@@ -119,19 +121,17 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
           link.download = `wish-${card.id}.jpeg`;
           link.href = dataUrl;
           link.click();
-          // Restore transform after capture
-          if (cardRef.current) {
+          if (cardRef.current && !isMobileView) {
             cardRef.current.style.transform = originalTransform;
           }
         }).catch((error) => {
           console.error('oops, something went wrong!', error);
-           // Restore transform even if there's an error
-           if (cardRef.current) {
+           if (cardRef.current && !isMobileView) {
             cardRef.current.style.transform = originalTransform;
           }
         });
     }
-  }, [card.id, card.style]);
+  }, [card.id, card.style, isMobileView]);
 
   const handleReaction = (reactionType: ReactionType) => {
     const updatedCard = {
@@ -151,10 +151,11 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
     <Card
       ref={cardRef}
       className={cn(
-        "absolute w-[250px] sm:w-[300px] min-h-[150px] transition-all duration-300 ease-in-out hover:animate-shake group"
+        "w-[300px] min-h-[150px] transition-all duration-300 ease-in-out group",
+        isMobileView ? "relative w-full max-w-sm" : "absolute hover:animate-shake",
       )}
       style={{
-        transform: `translate(${card.position.x}px, ${card.position.y}px)`,
+        ...(!isMobileView && { transform: `translate(${card.position.x}px, ${card.position.y}px)` }),
         color: card.style.textColor,
         fontFamily: card.style.fontFamily,
         ...(backgroundStyle.startsWith('#')
@@ -166,22 +167,24 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
       <CardHeader>
         <CardTitle className="flex justify-between items-start">
           <span>{card.name}</span>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 cursor-grab group-hover:opacity-100 opacity-0 transition-opacity hover:bg-white/20"
-                  onMouseDown={handleDragStart}
-                  aria-label="Drag card"
-                >
-                  <GripVertical className="h-5 w-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Drag</p>
-              </TooltipContent>
-            </Tooltip>
+            {!isMobileView && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 cursor-grab group-hover:opacity-100 opacity-0 transition-opacity hover:bg-white/20"
+                    onMouseDown={handleDragStart}
+                    aria-label="Drag card"
+                  >
+                    <GripVertical className="h-5 w-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Drag</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
         </CardTitle>
         <CardDescription style={{ color: card.style.textColor, opacity: 0.8 }}>
           {format(new Date(card.createdAt), "PPP, p")}
