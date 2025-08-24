@@ -22,7 +22,7 @@ export function Header({ addCard, cards }: HeaderProps) {
           Amani Kanu
         </h1>
       </div>
-      <div className="flex flex-col md:flex-row items-center gap-4">
+      <div className="flex  flex-col-reverse md:flex-row items-center gap-4">
         <div className="flex items-center gap-4 text-white pr-4">
           <div className="flex items-center gap-1" title={`${totalCards} wishes`}>
             <MessageSquare className="h-5 w-5" />
