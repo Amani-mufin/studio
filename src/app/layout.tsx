@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'Good Wishes',
-  description: 'A memory board for your special events.',
+  title: 'Amani Kanu (The Tech Evangelist)',
+  description: 'A memory board for Amani Kanu (The Tech Evangelist).',
 };
 
 export default function RootLayout({

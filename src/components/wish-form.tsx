@@ -82,7 +82,7 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
     name: cardData?.name ?? '',
     imageUrl: cardData?.imageUrl ?? DEFAULT_IMAGES[0],
     style: cardData?.style ?? {
-      background: 'bg-gradient-pink',
+      background: 'bg-gradient-blue',
       textColor: '#ffffff',
       fontFamily: 'Inter, sans-serif',
     },
@@ -118,9 +118,9 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-md max-h-screen overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit Wish' : 'Share a wish'}</DialogTitle>
+          <DialogTitle>{isEditing ? 'Edit Wish' : 'Write your wish'}</DialogTitle>
           <DialogDescription>
-            {isEditing ? 'Update the details of your wish.' : 'Share a wish for the memory board.'}
+            {isEditing ? 'Update the details of your wish.' : 'Wish Amani Kanu happy birthday.'}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -157,7 +157,7 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
               name="imageUrl"
               render={({ field }) => (
                 <FormItem className="space-y-3">
-                  <FormLabel>Photo</FormLabel>
+                  <FormLabel>Choose a photo for your wish card</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
@@ -195,10 +195,10 @@ export function WishForm({ cardData, onSave }: WishFormProps) {
                       <FormControl>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                           {[
-                            { value: "bg-gradient-pink", label: "Pink" },
                             { value: "bg-gradient-blue", label: "Blue" },
-                            { value: "bg-gradient-purple", label: "Purple" },
                             { value: "bg-gradient-green", label: "Green" },
+                            { value: "bg-gradient-pink", label: "Pink" },
+                            { value: "bg-gradient-purple", label: "Purple" },
                             { value: "bg-gradient-orange", label: "Orange" },
                             { value: "bg-gradient-teal", label: "Teal" },
                           ].map((color) => (
