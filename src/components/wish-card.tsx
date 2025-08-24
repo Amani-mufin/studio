@@ -193,7 +193,7 @@ export function WishCard({ card, updateCard, updateCardPosition, isMobileView = 
       <CardContent>
         {card.imageUrl && (
           <div className="relative h-40 mb-4 rounded-md overflow-hidden">
-            <Image src={card.imageUrl} alt={card.name} layout="fill" objectFit="cover" data-ai-hint="celebration event" />
+            <Image src={card.imageUrl} alt={card.name} layout="fill" objectFit="cover" objectPosition="top" data-ai-hint="celebration event" />
           </div>
         )}
         <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
