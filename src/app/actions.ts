@@ -21,7 +21,7 @@ export const getPoemAction = getPoemFromAi;
 
 // --- Firestore Server Actions ---
 
-const memoriesCollection = collection(db, 'memory');
+const memoriesCollection = collection(db, 'memories');
 
 export async function getMemories(): Promise<MemoryCardData[]> {
   try {
@@ -64,7 +64,7 @@ export async function addMemory(
       createdAt: serverTimestamp(),
     };
     
-    // Add the document to the 'memory' collection.
+    // Add the document to the 'memories' collection.
     const docRef = await addDoc(memoriesCollection, docData);
 
     // Fetch the newly created document from Firestore to get the generated ID and timestamp.
@@ -100,7 +100,7 @@ export async function updateMemory(
   memoryData: Partial<Omit<MemoryCardData, 'id' | 'createdAt'>>
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const memoryDoc = doc(db, 'memory', memoryId);
+    const memoryDoc = doc(db, 'memories', memoryId);
     await updateDoc(memoryDoc, memoryData);
     return { success: true };
   } catch (error) {
@@ -114,7 +114,7 @@ export async function updateMemoryPosition(
   position: { x: number; y: number }
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const memoryDoc = doc(db, 'memory', memoryId);
+    const memoryDoc = doc(db, 'memories', memoryId);
     await updateDoc(memoryDoc, { position });
     return { success: true };
   } catch (error) {

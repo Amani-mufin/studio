@@ -1,0 +1,256 @@
+'use client';
+
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import type { MemoryCardData } from '@/lib/types';
+import Image from 'next/image';
+
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Plus, Edit } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+
+const formSchema = z.object({
+  wish: z.string().min(1, 'A memory is required.'),
+  name: z.string().min(1, 'Your name is required.'),
+  imageUrl: z.string().optional(),
+  style: z.object({
+    background: z.string(),
+    textColor: z.string(),
+    fontFamily: z.string(),
+  }),
+});
+
+type FormValues = z.infer<typeof formSchema>;
+
+interface MemoryFormProps {
+  cardData?: MemoryCardData;
+  onSave: (data: any) => void;
+}
+
+const FONT_OPTIONS = [
+  { label: 'Body (Inter)', value: 'Inter, sans-serif' },
+  { label: 'Headline (Space Grotesk)', value: 'Space Grotesk, sans-serif' },
+  { label: 'Serif (Playfair Display)', value: 'Playfair Display, serif' },
+  { label: 'Sans-Serif (Lato)', value: 'Lato, sans-serif' },
+  { label: 'Monospace (Roboto Mono)', value: 'Roboto Mono, monospace' },
+];
+
+const DEFAULT_IMAGES = [
+  'https://res.cloudinary.com/sirsuccess/image/upload/v1755979859/IMG-20250616-WA0039_1_u9c4ta.jpg',
+  'https://res.cloudinary.com/sirsuccess/image/upload/v1755992720/DSC_1520e_1_xzvgrs.jpg',
+  'https://res.cloudinary.com/sirsuccess/image/upload/v1755992335/DSC_1409e_1_1_cpt7f6.jpg',
+  'https://res.cloudinary.com/sirsuccess/image/upload/v1755979924/DSC_1446e_azwxc6.jpg',
+  'https://res.cloudinary.com/sirsuccess/image/upload/v1755992334/DSC_1457e_1_ietwur.jpg',
+  'https://res.cloudinary.com/sirsuccess/image/upload/v1755979924/DSC_1433e_vdsk1v.jpg',
+];
+
+export function MemoryForm({ cardData, onSave }: MemoryFormProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const isEditing = !!cardData;
+
+  const defaultValues: FormValues = {
+    wish: cardData?.wish ?? '',
+    name: cardData?.name ?? '',
+    imageUrl: cardData?.imageUrl ?? DEFAULT_IMAGES[0],
+    style: cardData?.style ?? {
+      background: 'bg-gradient-blue',
+      textColor: '#ffffff',
+      fontFamily: 'Inter, sans-serif',
+    },
+  };
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues,
+  });
+
+  const onSubmit = (values: FormValues) => {
+    if (isEditing) {
+      onSave({ ...cardData, ...values });
+    } else {
+      onSave(values);
+    }
+    setIsOpen(false);
+    form.reset(defaultValues);
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        {isEditing ? (
+          <Button variant="ghost" size="icon" aria-label="Edit card" className="hover:bg-white/20">
+            <Edit className="h-4 w-4" />
+          </Button>
+        ) : (
+          <Button>
+            <Plus className="mr-2 h-4 w-4" /> Share a Memory
+          </Button>
+        )}
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md max-h-screen overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{isEditing ? 'Edit Memory' : 'Create a Memory'}</DialogTitle>
+          <DialogDescription>
+            {isEditing ? 'Update the details of your memory.' : 'Share a memory on the board.'}
+          </DialogDescription>
+        </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="wish"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Your Memory</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Share your heartfelt memory..." {...field} rows={4} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Your Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., Jane Doe" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="imageUrl"
+              render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormLabel>Choose a photo for your memory card</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="grid grid-cols-2 sm:grid-cols-3 gap-4"
+                    >
+                      {DEFAULT_IMAGES.map((url, index) => (
+                        <FormItem key={url} className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value={url} id={`image-${index}`} className="peer sr-only" />
+                          </FormControl>
+                          <Label
+                            htmlFor={`image-${index}`}
+                            className="relative flex items-center justify-center rounded-full border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer w-20 h-20 overflow-hidden"
+                          >
+                            <Image src={url} alt={`Default image ${index + 1}`} layout="fill" objectFit="cover" data-ai-hint={index < 3 ? "celebration event" : "man portrait"} />
+                          </Label>
+                        </FormItem>
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="space-y-4 pt-4 border-t">
+              <h3 className="text-lg font-medium">Customize Card</h3>
+                <FormField
+                  control={form.control}
+                  name="style.background"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Card Appearance</FormLabel>
+                      <FormControl>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                          {[
+                            { value: "bg-gradient-blue", label: "Blue" },
+                            { value: "bg-gradient-green", label: "Green" },
+                            { value: "bg-gradient-pink", label: "Pink" },
+                            { value: "bg-gradient-purple", label: "Purple" },
+                            { value: "bg-gradient-orange", label: "Orange" },
+                            { value: "bg-gradient-teal", label: "Teal" },
+                          ].map((color) => (
+                            <button
+                              key={color.value}
+                              type="button"
+                              onClick={() => field.onChange(color.value)}
+                              className={`p-4 rounded-xl ${color.value} hover:scale-105 transition-transform ${
+                                field.value === color.value ? "ring-2 ring-primary" : ""
+                              }`}
+                              aria-label={`Select ${color.label} gradient`}
+                            >
+                              <div className="w-full h-8 rounded bg-white/20"></div>
+                            </button>
+                          ))}
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              <FormField
+                control={form.control}
+                name="style.fontFamily"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Font Family</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a font" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {FONT_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            <DialogFooter>
+              <Button type="submit">Save Memory</Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
+}

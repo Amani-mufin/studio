@@ -1,4 +1,4 @@
-import { WishForm } from './wish-form';
+import { MemoryForm } from './memory-form';
 import type { MemoryCardData } from '@/lib/types';
 import { ShareBoardButton } from './share-board-button';
 import { Logo } from './logo';
@@ -14,12 +14,12 @@ export function Header({ addCard, cards }: HeaderProps) {
       <div className="flex items-center gap-2">
         <Logo className="h-8 w-8" />
         <h1 className="text-xl md:text-3xl font-headline font-bold text-white">
-          Amani Kanu
+          Memory App
         </h1>
       </div>
       <div className="flex flex-col md:flex-row items-center gap-2">
         {/* <ShareBoardButton cards={cards} /> */}
-        <WishForm onSave={addCard} />
+        <MemoryForm onSave={addCard} />
       </div>
     </header>
   );
