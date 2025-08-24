@@ -35,15 +35,20 @@ export async function getWishes(): Promise<WishCardData[]> {
 
     return snapshot.docs.map((doc) => {
       const data = doc.data();
+      // When data is fetched from Firestore, createdAt is a Timestamp object.
+      // It needs to be converted to a serializable format (like an ISO string)
+      // before being sent to the client component.
       const createdAt = data.createdAt as Timestamp;
       return {
         ...data,
         id: doc.id,
+        // Convert Timestamp to ISO string. Handle cases where it might be null.
         createdAt: createdAt ? createdAt.toDate().toISOString() : new Date().toISOString(),
       } as WishCardData;
     });
   } catch (error) {
     console.error('Error fetching wishes from Firestore:', error);
+    // In case of an error, return an empty array to prevent the app from crashing.
     return [];
   }
 }
@@ -52,29 +57,43 @@ export async function addWish(
   wishData: Omit<WishCardData, 'id' | 'createdAt'>
 ): Promise<WishCardData | { error: string }> {
   try {
-    const docRef = await addDoc(wishesCollection, {
+    // The data to be added to Firestore.
+    // We include `createdAt: serverTimestamp()` to let Firestore generate the timestamp.
+    const docData = {
       ...wishData,
       createdAt: serverTimestamp(),
-    });
-    const newDoc = await getDoc(docRef);
-    const data = newDoc.data();
-    if (!data) {
-        throw new Error("Could not retrieve new wish after creation.")
-    }
-    const createdAt = data.createdAt as Timestamp;
+    };
     
+    // Add the document to the 'wishes' collection.
+    const docRef = await addDoc(wishesCollection, docData);
+
+    // Fetch the newly created document from Firestore to get the generated ID and timestamp.
+    const newDocSnapshot = await getDoc(docRef);
+    
+    if (!newDocSnapshot.exists()) {
+      throw new Error("Failed to retrieve the new wish after creation.");
+    }
+
+    const newWishData = newDocSnapshot.data();
+    const createdAtTimestamp = newWishData.createdAt as Timestamp;
+
+    // Construct the final WishCardData object with the server-generated values.
     const newWish: WishCardData = {
-        ...data,
-        id: docRef.id,
-        createdAt: createdAt.toDate().toISOString(),
-    } as WishCardData;
+      ...(newWishData as Omit<WishCardData, 'id' | 'createdAt'>), // Cast the data to the correct type
+      id: docRef.id,
+      createdAt: createdAtTimestamp.toDate().toISOString(),
+    };
 
     return newWish;
   } catch (error) {
     console.error('Error adding wish to Firestore:', error);
-    return { error: 'Failed to add wish.' };
+    if (error instanceof Error) {
+        return { error: `Failed to add wish: ${error.message}` };
+    }
+    return { error: 'An unknown error occurred while adding the wish.' };
   }
 }
+
 
 export async function updateWish(
   wishId: string,
