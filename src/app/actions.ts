@@ -12,6 +12,7 @@ import {
   Timestamp,
   orderBy,
   query,
+  getDoc,
 } from 'firebase/firestore';
 import { getPoemAction as getPoemFromAi } from '@/ai/flows/generate-poem-for-wish';
 
@@ -38,12 +39,11 @@ export async function getWishes(): Promise<WishCardData[]> {
       return {
         ...data,
         id: doc.id,
-        createdAt: createdAt.toDate().toISOString(),
+        createdAt: createdAt ? createdAt.toDate().toISOString() : new Date().toISOString(),
       } as WishCardData;
     });
   } catch (error) {
     console.error('Error fetching wishes from Firestore:', error);
-    // Return empty array on error to prevent app crash
     return [];
   }
 }
@@ -52,20 +52,23 @@ export async function addWish(
   wishData: Omit<WishCardData, 'id' | 'createdAt'>
 ): Promise<WishCardData | { error: string }> {
   try {
-    const docData = {
+    const docRef = await addDoc(wishesCollection, {
       ...wishData,
       createdAt: serverTimestamp(),
-    };
-    const docRef = await addDoc(wishesCollection, docData);
+    });
+    const newDoc = await getDoc(docRef);
+    const data = newDoc.data();
+    if (!data) {
+        throw new Error("Could not retrieve new wish after creation.")
+    }
+    const createdAt = data.createdAt as Timestamp;
     
-    // For optimistic update, we can't get the server timestamp back immediately.
-    // We will return the data with a client-generated timestamp.
-    // The real data will be fetched on the next load.
     const newWish: WishCardData = {
-      ...wishData,
-      id: docRef.id,
-      createdAt: new Date().toISOString(),
-    };
+        ...data,
+        id: docRef.id,
+        createdAt: createdAt.toDate().toISOString(),
+    } as WishCardData;
+
     return newWish;
   } catch (error) {
     console.error('Error adding wish to Firestore:', error);
