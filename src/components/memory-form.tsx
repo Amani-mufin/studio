@@ -112,7 +112,7 @@ export function MemoryForm({ cardData, onSave }: MemoryFormProps) {
           </Button>
         ) : (
           <Button>
-            <Plus className="mr-2 h-4 w-4" /> Share a Memory
+            <Plus className="mr-2 h-4 w-4" /> Share a wish
           </Button>
         )}
       </DialogTrigger>
@@ -130,9 +130,9 @@ export function MemoryForm({ cardData, onSave }: MemoryFormProps) {
               name="wish"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Your Memory</FormLabel>
+                  <FormLabel>Your wish</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Share your heartfelt memory..." {...field} rows={4} />
+                    <Textarea placeholder="Share your heartfelt wish..." {...field} rows={4} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -157,7 +157,7 @@ export function MemoryForm({ cardData, onSave }: MemoryFormProps) {
               name="imageUrl"
               render={({ field }) => (
                 <FormItem className="space-y-3">
-                  <FormLabel>Choose a photo for your memory card</FormLabel>
+                  <FormLabel>Choose a photo for your wish card</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}

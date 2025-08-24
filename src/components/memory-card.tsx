@@ -116,6 +116,10 @@ export function MemoryCard({ card, updateCard, updateCardPosition, isMobileView 
           color: card.style.textColor,
           fontFamily: card.style.fontFamily,
         },
+        filter: (node) => {
+          // Exclude the node if it has the 'exclude-from-download' class
+          return !node.classList?.contains('exclude-from-download');
+        },
       }).then((dataUrl) => {
           const link = document.createElement('a');
           link.download = `memory-${card.id}.jpeg`;
@@ -216,7 +220,7 @@ export function MemoryCard({ card, updateCard, updateCardPosition, isMobileView 
           )}
         </Collapsible>
       </CardContent>
-      <CardFooter className="flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <CardFooter className="flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 exclude-from-download">
         <div className="flex gap-1 items-center">
           <Tooltip>
             <TooltipTrigger asChild>

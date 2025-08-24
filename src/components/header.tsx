@@ -14,7 +14,7 @@ export function Header({ addCard, cards }: HeaderProps) {
       <div className="flex items-center gap-2">
         <Logo className="h-8 w-8" />
         <h1 className="text-xl md:text-3xl font-headline font-bold text-white">
-          Memory App
+          Amani Kanu
         </h1>
       </div>
       <div className="flex flex-col md:flex-row items-center gap-2">
