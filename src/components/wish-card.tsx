@@ -103,15 +103,35 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
 
   const handleDownload = useCallback(() => {
     if (cardRef.current) {
-      htmlToImage.toJpeg(cardRef.current, { quality: 0.95 })
-        .then((dataUrl) => {
+       // Temporarily remove transform for capture
+      const originalTransform = cardRef.current.style.transform;
+      cardRef.current.style.transform = '';
+
+      htmlToImage.toJpeg(cardRef.current, { 
+        quality: 0.95,
+        backgroundColor: '#1e1e1e', // Fallback background color
+        style: {
+          color: card.style.textColor,
+          fontFamily: card.style.fontFamily,
+        },
+      }).then((dataUrl) => {
           const link = document.createElement('a');
           link.download = `wish-${card.id}.jpeg`;
           link.href = dataUrl;
           link.click();
+          // Restore transform after capture
+          if (cardRef.current) {
+            cardRef.current.style.transform = originalTransform;
+          }
+        }).catch((error) => {
+          console.error('oops, something went wrong!', error);
+           // Restore transform even if there's an error
+           if (cardRef.current) {
+            cardRef.current.style.transform = originalTransform;
+          }
         });
     }
-  }, [card.id]);
+  }, [card.id, card.style]);
 
   const handleReaction = (reactionType: ReactionType) => {
     const updatedCard = {
@@ -131,7 +151,7 @@ export function WishCard({ card, updateCard, updateCardPosition }: WishCardProps
     <Card
       ref={cardRef}
       className={cn(
-        "absolute w-[280px] sm:w-[300px] min-h-[150px] transition-all duration-300 ease-in-out hover:animate-shake group"
+        "absolute w-[250px] sm:w-[300px] min-h-[150px] transition-all duration-300 ease-in-out hover:animate-shake group"
       )}
       style={{
         transform: `translate(${card.position.x}px, ${card.position.y}px)`,
