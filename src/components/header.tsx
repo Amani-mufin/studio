@@ -1,11 +1,11 @@
 import { WishForm } from './wish-form';
-import type { WishCardData } from '@/lib/types';
+import type { MemoryCardData } from '@/lib/types';
 import { ShareBoardButton } from './share-board-button';
 import { Logo } from './logo';
 
 interface HeaderProps {
-  addCard: (card: Omit<WishCardData, 'id' | 'createdAt' | 'position'>) => void;
-  cards: WishCardData[];
+  addCard: (card: Omit<MemoryCardData, 'id' | 'createdAt' | 'position'>) => void;
+  cards: MemoryCardData[];
 }
 
 export function Header({ addCard, cards }: HeaderProps) {

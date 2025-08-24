@@ -1,31 +1,31 @@
 'use client';
 
 import { useState, useEffect, useCallback, useTransition } from 'react';
-import type { WishCardData } from '@/lib/types';
+import type { MemoryCardData } from '@/lib/types';
 import {
-  getWishes,
-  addWish,
-  updateWish as updateWishAction,
-  updateWishPosition as updateWishPositionAction,
+  getMemories,
+  addMemory,
+  updateMemory as updateMemoryAction,
+  updateMemoryPosition as updateMemoryPositionAction,
 } from '@/app/actions';
 import { useToast } from './use-toast';
 
 export function useWishBoard() {
-  const [cards, setCards] = useState<WishCardData[]>([]);
+  const [cards, setCards] = useState<MemoryCardData[]>([]);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   
-  const loadWishes = useCallback(async () => {
+  const loadMemories = useCallback(async () => {
     setIsLoading(true);
     try {
-      const fetchedWishes = await getWishes();
-      setCards(fetchedWishes);
+      const fetchedMemories = await getMemories();
+      setCards(fetchedMemories);
     } catch (error) {
-      console.error("Failed to load wishes:", error);
+      console.error("Failed to load memories:", error);
       toast({
         variant: 'destructive',
-        title: 'Error Loading Wishes',
-        description: 'Could not retrieve wishes from the database.',
+        title: 'Error Loading Memories',
+        description: 'Could not retrieve memories from the database.',
       });
     } finally {
       setIsLoading(false);
@@ -33,14 +33,14 @@ export function useWishBoard() {
   }, [toast]);
 
   useEffect(() => {
-    loadWishes();
-  }, [loadWishes]);
+    loadMemories();
+  }, [loadMemories]);
 
   const addCard = useCallback(
     async (
-      cardData: Omit<WishCardData, 'id' | 'createdAt' | 'position' | 'reactions'>
+      cardData: Omit<MemoryCardData, 'id' | 'createdAt' | 'position' | 'reactions'>
     ) => {
-      const newCardData: Omit<WishCardData, 'id' | 'createdAt'> = {
+      const newCardData: Omit<MemoryCardData, 'id' | 'createdAt'> = {
         position: {
           x: Math.random() * (window.innerWidth - 350),
           y: 100 + Math.random() * (window.innerHeight - 450),
@@ -53,14 +53,14 @@ export function useWishBoard() {
       };
 
       const tempId = `temp-${Date.now()}`;
-      const optimisticCard: WishCardData = {
+      const optimisticCard: MemoryCardData = {
         ...newCardData,
         id: tempId,
         createdAt: new Date().toISOString(),
       };
       setCards((prev) => [optimisticCard, ...prev]);
 
-      const result = await addWish(newCardData);
+      const result = await addMemory(newCardData);
       
       if ('error' in result) {
         toast({
@@ -80,13 +80,13 @@ export function useWishBoard() {
   );
 
   const updateCard = useCallback(
-    async (updatedCard: WishCardData) => {
+    async (updatedCard: MemoryCardData) => {
       const originalCards = cards;
       setCards((prev) =>
         prev.map((card) => (card.id === updatedCard.id ? updatedCard : card))
       );
       const { id, createdAt, ...dataToUpdate } = updatedCard;
-      const result = await updateWishAction(id, dataToUpdate);
+      const result = await updateMemoryAction(id, dataToUpdate);
 
       if (result.error) {
         toast({
@@ -110,7 +110,7 @@ export function useWishBoard() {
       
       // Debounce the database update to avoid excessive writes during drag
       const timer = setTimeout(async () => {
-         const result = await updateWishPositionAction(id, position);
+         const result = await updateMemoryPositionAction(id, position);
       
         if (result.error) {
           toast({

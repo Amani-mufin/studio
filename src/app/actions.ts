@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/lib/firebase';
-import type { WishCardData } from '@/lib/types';
+import type { MemoryCardData } from '@/lib/types';
 import {
   collection,
   getDocs,
@@ -21,15 +21,15 @@ export const getPoemAction = getPoemFromAi;
 
 // --- Firestore Server Actions ---
 
-const wishesCollection = collection(db, 'wishes');
+const memoriesCollection = collection(db, 'memory');
 
-export async function getWishes(): Promise<WishCardData[]> {
+export async function getMemories(): Promise<MemoryCardData[]> {
   try {
-    const q = query(wishesCollection, orderBy('createdAt', 'desc'));
+    const q = query(memoriesCollection, orderBy('createdAt', 'desc'));
     const snapshot = await getDocs(q);
     
     if (snapshot.empty) {
-      console.log('No wishes found in Firestore.');
+      console.log('No memories found in Firestore.');
       return [];
     }
 
@@ -44,81 +44,81 @@ export async function getWishes(): Promise<WishCardData[]> {
         id: doc.id,
         // Convert Timestamp to ISO string. Handle cases where it might be null.
         createdAt: createdAt ? createdAt.toDate().toISOString() : new Date().toISOString(),
-      } as WishCardData;
+      } as MemoryCardData;
     });
   } catch (error) {
-    console.error('Error fetching wishes from Firestore:', error);
+    console.error('Error fetching memories from Firestore:', error);
     // In case of an error, return an empty array to prevent the app from crashing.
     return [];
   }
 }
 
-export async function addWish(
-  wishData: Omit<WishCardData, 'id' | 'createdAt'>
-): Promise<WishCardData | { error: string }> {
+export async function addMemory(
+  memoryData: Omit<MemoryCardData, 'id' | 'createdAt'>
+): Promise<MemoryCardData | { error: string }> {
   try {
     // The data to be added to Firestore.
     // We include `createdAt: serverTimestamp()` to let Firestore generate the timestamp.
     const docData = {
-      ...wishData,
+      ...memoryData,
       createdAt: serverTimestamp(),
     };
     
-    // Add the document to the 'wishes' collection.
-    const docRef = await addDoc(wishesCollection, docData);
+    // Add the document to the 'memory' collection.
+    const docRef = await addDoc(memoriesCollection, docData);
 
     // Fetch the newly created document from Firestore to get the generated ID and timestamp.
     const newDocSnapshot = await getDoc(docRef);
     
     if (!newDocSnapshot.exists()) {
-      throw new Error("Failed to retrieve the new wish after creation.");
+      throw new Error("Failed to retrieve the new memory after creation.");
     }
 
-    const newWishData = newDocSnapshot.data();
-    const createdAtTimestamp = newWishData.createdAt as Timestamp;
+    const newMemoryData = newDocSnapshot.data();
+    const createdAtTimestamp = newMemoryData.createdAt as Timestamp;
 
-    // Construct the final WishCardData object with the server-generated values.
-    const newWish: WishCardData = {
-      ...(newWishData as Omit<WishCardData, 'id' | 'createdAt'>), // Cast the data to the correct type
+    // Construct the final MemoryCardData object with the server-generated values.
+    const newMemory: MemoryCardData = {
+      ...(newMemoryData as Omit<MemoryCardData, 'id' | 'createdAt'>), // Cast the data to the correct type
       id: docRef.id,
       createdAt: createdAtTimestamp.toDate().toISOString(),
     };
 
-    return newWish;
+    return newMemory;
   } catch (error) {
-    console.error('Error adding wish to Firestore:', error);
+    console.error('Error adding memory to Firestore:', error);
     if (error instanceof Error) {
-        return { error: `Failed to add wish: ${error.message}` };
+        return { error: `Failed to add memory: ${error.message}` };
     }
-    return { error: 'An unknown error occurred while adding the wish.' };
+    return { error: 'An unknown error occurred while adding the memory.' };
   }
 }
 
 
-export async function updateWish(
-  wishId: string,
-  wishData: Partial<Omit<WishCardData, 'id' | 'createdAt'>>
+export async function updateMemory(
+  memoryId: string,
+  memoryData: Partial<Omit<MemoryCardData, 'id' | 'createdAt'>>
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const wishDoc = doc(db, 'wishes', wishId);
-    await updateDoc(wishDoc, wishData);
+    const memoryDoc = doc(db, 'memory', memoryId);
+    await updateDoc(memoryDoc, memoryData);
     return { success: true };
   } catch (error) {
-    console.error('Error updating wish in Firestore:', error);
-    return { error: 'Failed to update wish.' };
+    console.error('Error updating memory in Firestore:', error);
+    return { error: 'Failed to update memory.' };
   }
 }
 
-export async function updateWishPosition(
-  wishId: string,
+export async function updateMemoryPosition(
+  memoryId: string,
   position: { x: number; y: number }
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const wishDoc = doc(db, 'wishes', wishId);
-    await updateDoc(wishDoc, { position });
+    const memoryDoc = doc(db, 'memory', memoryId);
+    await updateDoc(memoryDoc, { position });
     return { success: true };
   } catch (error) {
-    console.error('Error updating wish position in Firestore:', error);
-    return { error: 'Failed to update wish position.' };
+    console.error('Error updating memory position in Firestore:', error);
+    return { error: 'Failed to update memory position.' };
   }
 }

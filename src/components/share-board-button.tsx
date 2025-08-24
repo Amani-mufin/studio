@@ -4,10 +4,10 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Share2, Check } from 'lucide-react';
-import type { WishCardData } from '@/lib/types';
+import type { MemoryCardData } from '@/lib/types';
 
 interface ShareBoardButtonProps {
-  cards: WishCardData[];
+  cards: MemoryCardData[];
 }
 
 export function ShareBoardButton({ cards }: ShareBoardButtonProps) {

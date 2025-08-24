@@ -1,6 +1,6 @@
 'use client';
 
-import type { WishCardData, ReactionType } from '@/lib/types';
+import type { MemoryCardData, ReactionType } from '@/lib/types';
 import { useState, useRef, type MouseEvent, useTransition, useCallback, useEffect } from 'react';
 import { format } from 'date-fns';
 import Image from 'next/image';
@@ -24,8 +24,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 
 
 interface WishCardProps {
-  card: WishCardData;
-  updateCard: (card: WishCardData) => void;
+  card: MemoryCardData;
+  updateCard: (card: MemoryCardData) => void;
   updateCardPosition: (id: string, position: { x: number; y: number }) => void;
   isMobileView?: boolean;
 }

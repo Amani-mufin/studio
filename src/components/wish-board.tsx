@@ -1,9 +1,9 @@
 import { WishCard } from './wish-card';
-import type { WishCardData } from '@/lib/types';
+import type { MemoryCardData } from '@/lib/types';
 
 interface WishBoardProps {
-  cards: WishCardData[];
-  updateCard: (card: WishCardData) => void;
+  cards: MemoryCardData[];
+  updateCard: (card: MemoryCardData) => void;
   updateCardPosition: (id: string, position: { x: number; y: number }) => void;
 }
 

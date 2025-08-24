@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import type { WishCardData } from '@/lib/types';
+import type { MemoryCardData } from '@/lib/types';
 import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
@@ -52,7 +52,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 interface WishFormProps {
-  cardData?: WishCardData;
+  cardData?: MemoryCardData;
   onSave: (data: any) => void;
 }
 

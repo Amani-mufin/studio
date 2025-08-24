@@ -1,6 +1,6 @@
 export type ReactionType = 'love' | 'celebration';
 
-export interface WishCardData {
+export interface MemoryCardData {
   id: string;
   wish: string;
   name: string;
