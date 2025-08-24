@@ -270,7 +270,7 @@ export function MemoryCard({ card, updateCard, updateCardPosition, isMobileView 
             </CollapsibleContent>
             {showReadMore && (
               <CollapsibleTrigger asChild>
-                <Button variant="link" className="p-0 h-auto text-xs mt-2" style={{color: card.style.textColor}}>
+                <Button variant="link" className="p-0 h-auto text-xs mt-2 exclude-from-download" style={{color: card.style.textColor}}>
                   {isExpanded ? 'Read less' : 'Read more'}
                 </Button>
               </CollapsibleTrigger>
